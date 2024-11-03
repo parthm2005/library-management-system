@@ -8,6 +8,20 @@ class Book
 
 public:
     Book(string t, string a, string p, string id, bool status) : title(t), author(a), publication(p), isbn(id), isAvailable(status) {}
+    Book get_details(const string &line)
+    {
+        istringstream iss(line);
+        string title, author, isbn, publication, isava;
+        bool isavailable;
+        getline(iss, isbn, '\t');
+        getline(iss, title, '\t');
+        getline(iss, author, '\t');
+        getline(iss, publication, '\t');
+        getline(iss, isava, '\t');
+
+        isava == "1" ? isavailable = true : isavailable = false;
+        return Book(title, author, publication, isbn, isavailable);
+    }
     void borrow()
     {
         isAvailable = false;
@@ -16,9 +30,42 @@ public:
     {
         isAvailable = true;
     }
-    bool Available()
+    bool Available(string id)
     {
-        return isAvailable;
+        ifstream readf("books.txt");
+        if (readf.is_open())
+        {
+            bool flag = false;
+            string line;
+            while (getline(readf, line))
+            {
+                Book book = get_details(line);
+                if (book.isbn == id)
+                {
+                    if (book.isAvailable)
+                    {
+
+                        // book.display();
+                        return book.isAvailable;
+                    }
+                    else
+                    {
+                        cout << "Book is not availabale" << endl;
+                    }
+                    flag = true;
+                }
+            }
+            if (!flag)
+            {
+                cout << "Book not found" << endl;
+            }
+
+            readf.close();
+        }
+        else
+        {
+            cout << "unable to open" << endl;
+        }
     }
     void display()
     {
@@ -35,7 +82,8 @@ public:
     Student(string ID, string n, string e) : studentId(ID), name(n), email(e) {}
     void borrowBook(Book &book)
     {
-        if (book.Available())
+        string dummy;// for now
+        if (book.Available(dummy))
         {
             book.borrow();
             borrowedBooks.push_back(book);

@@ -50,7 +50,8 @@ public:
         {
             book.returnBook();
             borrowedBooks.erase(it);
-            cout << name << " returned " << book.display() << endl;
+            cout << name << " returned ";
+            book.display();
         }
         else
             cout << "This book was not borrowed by " << name << "." << endl;
@@ -65,5 +66,10 @@ public:
                 book.display();
             }
         }
+    }
+    void studentDetails()
+    {
+        cout<<"Member Details : ";
+        cout<<"Student ID : "<<studentId<<", Name : "<<name<<", Email : "<<email<<endl;
     }
 };

@@ -45,21 +45,22 @@ public:
     }
     void returnBook(Book &book)
     {
-        auto it=find(borrowedBooks.begin(),borrowedBooks.end(),book);
-        if(it!=borrowedBooks.end())
+        auto it = find(borrowedBooks.begin(), borrowedBooks.end(), book);
+        if (it != borrowedBooks.end())
         {
             book.returnBook();
             borrowedBooks.erase(it);
-            cout<<name<<" returned "<<book.display()<<endl;
+            cout << name << " returned " << book.display() << endl;
         }
-        else cout << "This book was not borrowed by " << name << "." << endl;
+        else
+            cout << "This book was not borrowed by " << name << "." << endl;
     }
     void displayBorrowedBooks()
     {
-        if(!borrowedBooks.empty())
+        if (!borrowedBooks.empty())
         {
-            cout<<name<<"'s borrowed books."<<endl;
-            for(auto book:borrowedBooks)
+            cout << name << "'s borrowed books." << endl;
+            for (auto book : borrowedBooks)
             {
                 book.display();
             }

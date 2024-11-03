@@ -3,6 +3,7 @@ using namespace std;
 
 class Book
 {
+protected:
     string title, author, publication, isbn;
     bool isAvailable = true;
 
@@ -30,7 +31,7 @@ public:
     {
         isAvailable = true;
     }
-    bool Available(string id)
+    void Available(string id)
     {
         ifstream readf("books.txt");
         if (readf.is_open())
@@ -45,19 +46,21 @@ public:
                     if (book.isAvailable)
                     {
 
-                        // book.display();
-                        return book.isAvailable;
+                        book.display();
+                        // return book.isAvailable;
                     }
                     else
                     {
                         cout << "Book is not availabale" << endl;
+                        // return 2;
                     }
                     flag = true;
                 }
             }
             if (!flag)
             {
-                cout << "Book not found" << endl;
+                cout << "Book not found" << endl; 
+                // return -1;
             }
 
             readf.close();
@@ -82,14 +85,7 @@ public:
     Student(string ID, string n, string e) : studentId(ID), name(n), email(e) {}
     void borrowBook(Book &book)
     {
-        string dummy;// for now
-        if (book.Available(dummy))
-        {
-            book.borrow();
-            borrowedBooks.push_back(book);
-        }
-        else
-            cout << "Book not available." << endl;
+        
     }
     // void returnBook(Book &book)
     // {

@@ -122,9 +122,80 @@ public:
             cout << "unable to open" << endl;
         }
     }
-    void returnBook()
+    void returnBook(string bid,string sid)
     {
-        isAvailable = true;
+        vector<Book> books;
+        bool found=false;
+        bool returned = false;
+        ifstream readf("books.txt");
+        if(!readf.is_open()){
+            cout<<"Unable to open book.txt wed"<<endl;
+            return ;
+        }
+        else{
+            string line;
+            while(getline(readf,line)){
+                Book b = get_details(line);
+                if(b.isbn==bid){
+                    found=true;
+                    if(!b.isAvailable){
+                        b.isAvailable=true;
+                        returned = true;
+                    }
+                    else{
+                        cout<<"Book is already available in the library "<<endl;
+                    }
+                }
+                books.push_back(b);
+            }
+            readf.close();
+        }
+        if(returned){
+            ofstream writef("books.txt",ios::trunc);
+            if(!writef.is_open()){
+                cout<<"Unable to open books.txt for writting "<<endl;
+                return;
+            }
+            for(const auto &book:books){
+                writef<<book.to_string()<<endl;
+            }
+            writef.close();
+            cout<<"Book returned successfully "<<endl;
+        }
+        if(returned){
+            ifstream readf("bothids.txt");
+            vector<string>updated_enteries;
+            if(!readf.is_open()){
+                cout<<"Unable to open bothids.txt "<<endl;
+                return;
+            }
+            string line;
+            while(getline(readf,line)){
+                istringstream iss(line);
+                string ssid,sbid;
+                getline(iss,ssid,'\t');
+                getline(iss,sbid,'\t');
+
+                if(!(ssid==sid && sbid==bid)){
+                    updated_enteries.push_back(line);
+                }
+            }
+            readf.close();
+
+            ofstream writef("bothids.txt",ios::trunc);
+            if(!writef.is_open()){
+                cout<<"Unable to open bothids.txt to write "<<endl;
+                return;
+            }
+            for(const auto &entry : updated_enteries){
+                writef<<entry<<endl;
+            }
+            writef.close();
+            cout<<"Updated the bothids.txt file "<<endl;
+        }
+        else if(!found){
+            cout<<"Book not found in the library "<<endl;
+        }
     }
     void Available(string id)
     {

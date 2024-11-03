@@ -8,7 +8,7 @@ protected:
     bool isAvailable = true;
 
 public:
-    Book(){};
+    Book() {};
     Book(string t, string a, string p, string id, bool status) : title(t), author(a), publication(p), isbn(id), isAvailable(status) {}
     Book get_details(const string &line)
     {
@@ -24,9 +24,103 @@ public:
         isava == "1" ? isavailable = true : isavailable = false;
         return Book(title, author, publication, isbn, isavailable);
     }
-    void borrow()
+    string to_string() const
     {
-        isAvailable = false;
+        return isbn + "\t" + title + "\t" + author + "\t" + publication + "\t" + (isAvailable ? "1" : "0");
+    }
+    void borrow(string sid, string bid)
+
+    {
+        bool isav = false;
+
+        vector<Book> books;
+        ifstream readf("books.txt");
+
+        if (readf.is_open())
+
+        {
+
+            bool flag = false;
+
+            string line;
+
+            while (getline(readf, line))
+
+            {
+
+                Book b = get_details(line);
+                if (b.isbn == bid)
+
+                {
+
+                    if (b.isAvailable)
+
+                    {
+
+                        std::ofstream file("bothids.txt", std::ios::app);
+
+                        if (!file)
+
+                        {
+
+                            std::cerr << "Error opening file." << std::endl;
+
+                            exit;
+                        }
+
+                        file << sid << "\t" << bid << endl;
+
+                        file.close();
+                        isav = true;
+                        b.isAvailable = false;
+                    }
+
+                    else
+
+                    {
+
+                        cout << "Book is not availabale to borrow." << endl;
+
+                        // return 2;
+                    }
+
+                    flag = true;
+                }
+                books.push_back(b);
+            }
+            if (!flag)
+
+            {
+
+                cout << "Book not found" << endl;
+
+                // return -123;
+            }
+
+            readf.close();
+        }
+        if (isav)
+        {
+            ofstream writef("books.txt", ios::trunc); // Open with truncate mode to overwrite
+            if (!writef.is_open())
+            {
+                cout << "Unable to open books.txt for writing" << endl;
+                return;
+            }
+            for (const auto &book : books)
+            {
+                writef << book.to_string() << endl;
+            }
+            writef.close();
+            cout << "Book borrowed successfully." << endl;
+        }
+
+        else
+
+        {
+
+            cout << "unable to open" << endl;
+        }
     }
     void returnBook()
     {
@@ -60,8 +154,30 @@ public:
             }
             if (!flag)
             {
-                cout << "Book not found" << endl; 
+                cout << "Book not found" << endl;
                 // return -1;
+            }
+
+            readf.close();
+        }
+        else
+        {
+            cout << "unable to open" << endl;
+        }
+    }
+    void borrowed_books(string id)
+    {
+        ifstream readf("books.txt");
+        if (readf.is_open())
+        {
+            string line;
+            while (getline(readf, line))
+            {
+                Book book = get_details(line);
+                if (book.isbn == id)
+                {
+                    book.display();
+                }
             }
 
             readf.close();
@@ -77,14 +193,14 @@ public:
     }
 };
 
-class Student
+class Student : public Book
 {
 protected:
     string studentId, name, email;
     vector<Book> borrowedBooks;
 
 public:
-Student(){};
+    Student() {};
     Student(string ID, string n, string e) : studentId(ID), name(n), email(e) {}
     Student get_student(const string &line)
     {
@@ -99,7 +215,6 @@ Student(){};
     }
     void borrowBook(Book &book)
     {
-        
     }
     // void returnBook(Book &book)
     // {
@@ -114,27 +229,54 @@ Student(){};
     //     else
     //         cout << "This book was not borrowed by " << name << "." << endl;
     // }
-    void displayBorrowedBooks()
+    string get_mem_books(string &line, string &p)
     {
-        if (!borrowedBooks.empty())
+        istringstream iss(line);
+        string stu_id, book_id;
+        getline(iss, stu_id, '\t');
+        getline(iss, book_id, '\t');
+        p = stu_id;
+        return book_id;
+    }
+    void displayBorrowedBooks(string stu_id)
+    {
+        vector<string> list;
+        ifstream readf("bothids.txt");
+        if (readf.is_open())
         {
-            cout << name << "'s borrowed books." << endl;
-            for (auto book : borrowedBooks)
+
+            string line;
+            while (getline(readf, line))
             {
-                book.display();
+                string p = "";
+                string b = get_mem_books(line, p);
+                if (p == stu_id)
+                {
+                    list.push_back(b);
+                }
             }
+            readf.close();
+        }
+        else
+        {
+            cout << "unable to open" << endl;
+        }
+
+        for (auto it : list)
+        {
+            borrowed_books(it);
         }
     }
     void studentDetails()
     {
-        cout<<"Member Details : ";
-        cout<<"Student ID : "<<studentId<<", Name : "<<name<<", Email : "<<email<<endl;
+        cout << "Member Details : ";
+        cout << "Student ID : " << studentId << ", Name : " << name << ", Email : " << email << endl;
     }
 };
-class Library : public Book, public Student
+class Library : public Student
 {
 public:
-    Library(){};
+    Library() {};
     void addbook(string tit, string auth, string publish, string id, bool isava)
     {
         // Book b1(tit,auth,publish,id,isava);

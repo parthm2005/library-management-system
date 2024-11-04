@@ -141,7 +141,7 @@ public:
                         returned = true;
                     }
                     else{
-                        cout<<"Book is already available in the library "<<endl;
+                        cout<<"You can't return book which you have not! Book is already available in the library"<<endl;
                     }
                 }
                 books.push_back(b);
@@ -151,7 +151,7 @@ public:
         if(returned){
             ofstream writef("books.txt",ios::trunc);
             if(!writef.is_open()){
-                cout<<"Unable to open books.txt for writting "<<endl;
+                cout<<"Unable to open books.txt for writing "<<endl;
                 return;
             }
             for(const auto &book:books){
@@ -260,33 +260,6 @@ public:
     {
         cout << "Title : " << title << ", Author : " << author << ", Publication : " << publication << ", ISBN : " << isbn << ", Available : " << (isAvailable ? "Yes" : "No") << endl;
     }
-    bool isStudentRegistered(string id){
-        string line;
-        ifstream readf("students.txt");
-        if (readf.is_open())
-        {
-            string line;
-            while (getline(readf, line))
-            {   
-                istringstream iss(line);
-                string sid;
-
-                getline(iss, sid, '\t');
-                if (sid == id)
-                {
-                    readf.close();
-                    return true;
-                }
-            }
-            readf.close();
-            return false;
-        }
-        else
-        {
-            cerr << "Unable to open the file students.txt" << endl;
-        }
-        return false;
-    }
     bool isBookThere(string id){
         string line;
         ifstream readf("books.txt");
@@ -337,6 +310,9 @@ public:
 
         return Student(studentId, name, email);
     }
+    string to_string() const{
+        return studentId + "\t" + name + "\t" + email;
+    }
     // void borrowBook(Book &book)
     // {
     // }
@@ -362,7 +338,33 @@ public:
         p = stu_id;
         return book_id;
     }
-    bool displayBorrowedBooks(string stu_id)
+    bool isStudentRegistered(string id){
+    string line;
+    ifstream readf("students.txt");
+    if (readf.is_open())
+    {
+        string line;
+        while (getline(readf, line))
+        {   
+            istringstream iss(line);
+            string sid;
+
+            getline(iss, sid, '\t');
+            if (sid == id)
+            {
+                readf.close();
+                return true;
+            }
+        }
+        readf.close();
+    }
+    else
+    {
+        cerr << "Unable to open the file students.txt" << endl;
+    }
+    return false;
+}
+    bool isBorrowed(string stu_id)
     {
         vector<string> list;
         ifstream readf("bothids.txt");
@@ -379,6 +381,34 @@ public:
                 {
                     list.push_back(b);
                     chk=true;
+                    readf.close();
+                    return chk;
+                }
+            }
+            readf.close();
+        }
+        else
+        {
+            cout << "unable to open" << endl;
+        }
+        return chk;
+    }
+    
+    void displayBorrowedBooks(string stu_id)
+    {
+        vector<string> list;
+        ifstream readf("bothids.txt");
+        if (readf.is_open())
+        {
+
+            string line;
+            while (getline(readf, line))
+            {
+                string p = "";
+                string b = get_mem_books(line, p);
+                if (p == stu_id)
+                {
+                    list.push_back(b);
                 }
             }
             readf.close();
@@ -392,8 +422,8 @@ public:
         {
             borrowed_books(it);
         }
-        return chk;
     }
+    
     void studentDetails()
     {
         cout << "Member Details : ";
@@ -431,12 +461,86 @@ public:
             cerr << "Unable to open the file " << endl;
         }
     }
-    // void removebook(){
 
-    // }
-    // void removestudent(){
+    void removebook(string id){
+        Book temp;
+        vector<Book> books;
+        if(temp.isBookThere(id)){
+            ifstream readf("books.txt");
+            if(!readf.is_open()){
+                cout<<"Unable to open book.txt!"<<endl;
+                return ;
+            }
+            else{
+                string line;
+                while(getline(readf,line)){
+                    Book b = get_details(line);
+                    istringstream iss(line);
+                    string isbn;
+                    getline(iss, isbn, '\t');
+                    if(isbn!=id){
+                        books.push_back(b);
+                    }
+                }
+                readf.close();
+            }
+            
+            ofstream writef("books.txt",ios::trunc);
+            if(!writef.is_open()){
+                cout<<"Unable to open books.txt for writting "<<endl;
+                return;
+            }
+            for(const auto &book:books){
+                writef<<book.to_string()<<endl;
+            }
+            writef.close();
+            cout<<"Book removed successfully!"<<endl;
+        }
+        
+        else{
+            cout<<"Book not found in the library."<<endl;
+        } 
+    }
 
-    // }
+    void removestudent(string id){
+        vector<Student> students;
+        if(isStudentRegistered(id)){
+            ifstream readf("students.txt");
+            if(!readf.is_open()){
+                cout<<"Unable to open students.txt!"<<endl;
+                return ;
+            }
+            else{
+                string line;
+                while(getline(readf,line)){
+                    Student s = get_student(line);
+                    istringstream iss(line);
+                    string sid;
+                    getline(iss, sid, '\t');
+                    if(sid!=id){
+                        students.push_back(s);
+                    }
+                }
+                readf.close();
+            }
+            
+            ofstream writef("students.txt",ios::trunc);
+            if(!writef.is_open()){
+                cout<<"Unable to open students.txt for writting "<<endl;
+                return;
+            }
+            for(const auto &student:students){
+                writef<<student.to_string()<<endl;
+            }
+            writef.close();
+            cout<<"Student removed successfully!"<<endl;
+        }
+        
+        else{
+            cout<<"Student not found."<<endl;
+        } 
+    }
+    
     void searchbook(string id)
     {
         Available(id);
@@ -499,15 +603,17 @@ int main()
 
         while(flag){
             cout<<"What do you want?\n";
-            cout<<"For add book, enter A \n";    
-            cout<<"For add student, enter B \n";    
-            cout<<"For search the book by id, enter C \n";    
-            cout<<"For display all books, enter D \n";
-            cout<<"For display all students, enter E \n";
+            cout<<"For add book, enter a \n";    
+            cout<<"For add student, enter b \n";    
+            cout<<"For remove book, enter c \n";    
+            cout<<"For remove student, enter d \n";    
+            cout<<"For search the book by id, enter e \n";    
+            cout<<"For display all books, enter f \n";
+            cout<<"For display all students, enter g \n";
             // cout<<"For doing student things, enter S\n";
-            cout<<"For close the menu, enter Z\n";
+            cout<<"For close the menu, enter z\n";
             cin>>chr;
-            if(chr=='Z'){
+            if(chr=='z'){
                 break;
             }
             
@@ -516,7 +622,7 @@ int main()
 
             switch (chr)
             {
-            case 'A':
+            case 'a':
             // addbook(string tit, string auth, string publish, string id, bool isava)
                 while(1){
 
@@ -558,7 +664,7 @@ int main()
                 }
                 break;
             
-            case 'B':
+            case 'b':
                 // addstudent(string studentId, string name, string email)
                 
                 while(1){
@@ -598,7 +704,74 @@ int main()
                 }
                     break;
             
-            case 'C':
+            case 'c':
+                while(1){
+
+                    int check;
+
+                    cout<<"For continue with remove book enter 1, for go to previouse menu enter 2: ";
+                    cin>>check;
+                    while((check!=1)&&(check!=2)){
+                        cout<<"Please enter 1 or 2 only for remove book or go to previouse menu respectively: ";
+                        cin>>check;
+                    }
+                    if(check==2){
+                        break;
+                    }
+
+                    while(1){
+                        cout<<"Enter id of the book: ";
+                        cin>>id;
+                        if(!admin.isBookThere(id)){
+                            cout<<"This book is not there in the library, please check book id, and try again!"<<endl;
+                        }
+                        else{
+                            break;
+                        }
+                    }
+
+                    admin.removebook(id);
+                }
+                break;
+
+
+            case 'd':
+                
+                while(1){
+
+                    int check;
+
+                    cout<<"For continue with remove student enter 1, for go to previouse menu enter 2: ";
+                    cin>>check;
+                    while((check!=1)&&(check!=2)){
+                        cout<<"Please enter 1 or 2 only for remove student or go to previouse menu respectively: ";
+                        cin>>check;
+                    }
+                    if(check==2){
+                        break;
+                    }
+
+
+                    while(1){
+                        cout<<"Enter student Id: ";
+                        cin>>studentId;
+                        if(!admin.isStudentRegistered(studentId)){
+                            cout<<"This student is not registered, please check student id and try again!"<<endl;
+                        }
+                        else if(studentId=="123"){
+                            cout<<"You can not remove admin!"<<endl;
+                        }
+                        else{
+                            break;
+                        }
+                    }
+                    admin.removestudent(studentId);
+                }
+                break;
+            
+
+
+            case 'e':
 
                 while(1){
 
@@ -620,7 +793,7 @@ int main()
                 }
                     break;
             
-            case 'D':
+            case 'f':
 
                 int check;
 
@@ -637,7 +810,7 @@ int main()
                 admin.dis_book();                
                 break;
             
-            case 'E':
+            case 'g':
 
                 cout<<"For continue with display all books, enter 1; for go to previouse menu enter 2: ";
                 cin>>check;
@@ -658,7 +831,7 @@ int main()
             //     break;
 
             default:
-                cout<<"You have to enter only 'A', 'B', 'C', 'D', 'E', or 'Z' only for respective it's works!";
+                cout<<"You have to enter only 'a', 'b', 'c', 'd', 'e', or 'z' only for respective it's works!";
                 break;
             }
         }
@@ -672,11 +845,12 @@ int main()
 
         while(flag){
             cout<<"What do you want?\n";
-            cout<<"For borrow the book, enter A \n";    
-            cout<<"For return the book, enter B \n";
-            cout<<"For close the menu, enter Z\n";
+            cout<<"For borrow the book, enter a \n";    
+            cout<<"For return the book, enter b \n";
+            cout<<"For display borrowed book, enter c \n";
+            cout<<"For close the menu, enter z\n";
             cin>>chr;
-            if(chr=='Z'){
+            if(chr=='z'){
                 break;
             }
             
@@ -684,7 +858,7 @@ int main()
 
             switch (chr)
             {
-            case 'A':
+            case 'a':
                 while(1){
 
                     int check;
@@ -712,8 +886,7 @@ int main()
                 }
                 break;
 
-            case 'B':
-            // addbook(string tit, string auth, string publish, string id, bool isava)
+            case 'b':
                 while(1){
 
                     int check;
@@ -728,7 +901,7 @@ int main()
                         break;
                     }
 
-                    if(student.displayBorrowedBooks(id)){
+                    if(student.isBorrowed(id)){
                         cout<<"Your borrowed books:\n";
                         student.displayBorrowedBooks(id);
                         cout<<"Enter id of the book: ";
@@ -743,8 +916,32 @@ int main()
                 break;
             
 
+            case 'c':
+                int check;
+
+                cout<<"For continue with display borrowed books enter 1, for go to previouse menu enter 2: ";
+                cin>>check;
+                while((check!=1)&&(check!=2)){
+                    cout<<"Please enter 1 or 2 only for display borrowed books or go to previouse menu respectively: ";
+                    cin>>check;
+                }
+                if(check==2){
+                    break;
+                }
+
+                if(student.isBorrowed(id)){
+                    cout<<"Your borrowed books:\n";
+                    student.displayBorrowedBooks(id);
+                }
+                else{
+                    cout<<"You have not borrowed any book!"<<endl;
+                    break;
+                }
+                break;
+            
+
             default:
-                cout<<"You have to enter only 'A', 'B', or 'Z' only for respective it's works!";
+                cout<<"You have to enter only 'a', 'b', 'c' or 'z' only for respective it's works!";
                 break;
             }
         }

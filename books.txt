@@ -1,8 +1,8 @@
 ew232	Harry Parker	jK Rowling	Wind 	0
 ew12	Harry Potter	Psldfo Rowling	client 	1
-sc23	prankit Potter	 premchand	jago jaog 	1
-123i	OOP	Balu sir	SVNIT	1
+sc23	prankit Potter	 premchand	jago jaog 	0
 dm18	Discreate Maths	Sankita J Patel	Patel Publication	1
 db01	DBMS	Rupa G	Maheta	1
-Co12	Computer Org	RPG	Gohil	1
+Co12	Computer Org	RPG	Gohil	0
 OOP123	OOP	Balu L Parne	Parne	1
+dh123	Desi Hisaab	Kon	Gala	1

@@ -41,9 +41,7 @@ public:
         {
 
             bool flag = false;
-
             string line;
-
             while (getline(readf, line))
 
             {
@@ -262,6 +260,61 @@ public:
     {
         cout << "Title : " << title << ", Author : " << author << ", Publication : " << publication << ", ISBN : " << isbn << ", Available : " << (isAvailable ? "Yes" : "No") << endl;
     }
+    bool isStudentRegistered(string id){
+        string line;
+        ifstream readf("students.txt");
+        if (readf.is_open())
+        {
+            string line;
+            while (getline(readf, line))
+            {   
+                istringstream iss(line);
+                string sid;
+
+                getline(iss, sid, '\t');
+                if (sid == id)
+                {
+                    readf.close();
+                    return true;
+                }
+            }
+            readf.close();
+            return false;
+        }
+        else
+        {
+            cerr << "Unable to open the file students.txt" << endl;
+        }
+        return false;
+    }
+    bool isBookThere(string id){
+        string line;
+        ifstream readf("books.txt");
+        if (readf.is_open())
+        {
+            string line;
+            while (getline(readf, line))
+            {   
+                istringstream iss(line);
+                string sid;
+                string name, email;
+
+                getline(iss, sid, '\t');
+                if (sid == id)
+                {
+                    readf.close();
+                    return true;
+                }
+            }
+            readf.close();
+            return false;
+        }
+        else
+        {
+            cerr << "Unable to open the file students.txt" << endl;
+        }
+        return false;
+    }
 };
 
 class Student : public Book
@@ -309,10 +362,11 @@ public:
         p = stu_id;
         return book_id;
     }
-    void displayBorrowedBooks(string stu_id)
+    bool displayBorrowedBooks(string stu_id)
     {
         vector<string> list;
         ifstream readf("bothids.txt");
+        bool chk=false;
         if (readf.is_open())
         {
 
@@ -324,6 +378,7 @@ public:
                 if (p == stu_id)
                 {
                     list.push_back(b);
+                    chk=true;
                 }
             }
             readf.close();
@@ -337,6 +392,7 @@ public:
         {
             borrowed_books(it);
         }
+        return chk;
     }
     void studentDetails()
     {
@@ -354,7 +410,7 @@ public:
         ofstream writef("books.txt", ios::app);
         if (writef.is_open())
         {
-            writef << isbn << "\t" << title << "\t" << author << "\t" << publication << "\t" << isAvailable << "\n";
+            writef << id << "\t" << tit << "\t" << auth << "\t" << publish << "\t" << isava << "\n";
             writef.close();
         }
         else
@@ -426,5 +482,279 @@ public:
 };
 int main()
 {
+
+    string id;
+    cout<<"Enter you ID: ";
+    cin>>id;
+    Student temp;
+
+    if(temp.isStudentRegistered(id)){
+    
+    if(id=="123"){
+
+        Library admin;
+        char chr;
+
+        bool flag=1;
+
+        while(flag){
+            cout<<"What do you want?\n";
+            cout<<"For add book, enter A \n";    
+            cout<<"For add student, enter B \n";    
+            cout<<"For search the book by id, enter C \n";    
+            cout<<"For display all books, enter D \n";
+            cout<<"For display all students, enter E \n";
+            // cout<<"For doing student things, enter S\n";
+            cout<<"For close the menu, enter Z\n";
+            cin>>chr;
+            if(chr=='Z'){
+                break;
+            }
+            
+            string tit, auth, publish, id, studentId, name, email, bid;
+            bool isava;
+
+            switch (chr)
+            {
+            case 'A':
+            // addbook(string tit, string auth, string publish, string id, bool isava)
+                while(1){
+
+                    int check;
+
+                    cout<<"For continue with add book enter 1, for go to previouse menu enter 2: ";
+                    cin>>check;
+                    while((check!=1)&&(check!=2)){
+                        cout<<"Please enter 1 or 2 only for add book or go to previouse menu respectively: ";
+                        cin>>check;
+                    }
+                    if(check==2){
+                        break;
+                    }
+
+                    while(1){
+                        cout<<"Enter id of the book: ";
+                        cin>>id;
+                        if(admin.isBookThere(id)){
+                            cout<<"This id is used for another book, please enter other book id!"<<endl;
+                        }
+                        else{
+                            break;
+                        }
+                    }
+
+                    cout<<"Enter title of the book: ";
+                    cin.ignore();
+                    getline(cin, tit);
+
+                    cout<<"Enter author of the book: ";
+                    getline(cin, auth);
+
+                    cout<<"Enter publisher name of the book: ";
+                    getline(cin, publish);
+
+
+                    admin.addbook(tit, auth, publish, id, 1);
+                }
+                break;
+            
+            case 'B':
+                // addstudent(string studentId, string name, string email)
+                
+                while(1){
+
+                    int check;
+
+                    cout<<"For continue with add student enter 1, for go to previouse menu enter 2: ";
+                    cin>>check;
+                    while((check!=1)&&(check!=2)){
+                        cout<<"Please enter 1 or 2 only for add student or go to previouse menu respectively: ";
+                        cin>>check;
+                    }
+                    if(check==2){
+                        break;
+                    }
+
+
+                    while(1){
+                        cout<<"Enter student Id: ";
+                        cin>>studentId;
+                        if(admin.isStudentRegistered(studentId)){
+                            cout<<"This student id is registered for another student, please enter other student id!"<<endl;
+                        }
+                        else{
+                            break;
+                        }
+                    }
+
+                    cout<<"Enter name of the student: ";
+                    cin.ignore();
+                    getline(cin, name);
+
+                    cout<<"Enter email of the student: ";
+                    cin>>email;
+
+                    admin.addstudent(studentId, name, email);
+                }
+                    break;
+            
+            case 'C':
+
+                while(1){
+
+                    int check;
+
+                    cout<<"For continue with search the book, enter 1, for go to previouse menu enter 2: ";
+                    cin>>check;
+                    while((check!=1)&&(check!=2)){
+                        cout<<"Please enter 1 or 2 only for search the book or go to previouse menu respectively: ";
+                        cin>>check;
+                    }
+                    if(check==2){
+                        break;
+                    }
+
+                    cout<<"Enter id of the book: ";
+                    cin>>bid;
+                    admin.searchbook(bid);
+                }
+                    break;
+            
+            case 'D':
+
+                int check;
+
+                cout<<"For continue with display all books, enter 1; for go to previouse menu enter 2: ";
+                cin>>check;
+                while((check!=1)&&(check!=2)){
+                    cout<<"Please enter 1 or 2 only for display all books or go to previouse menu respectively: ";
+                    cin>>check;
+                }
+
+                if(check==2){
+                    break;
+                }
+                admin.dis_book();                
+                break;
+            
+            case 'E':
+
+                cout<<"For continue with display all books, enter 1; for go to previouse menu enter 2: ";
+                cin>>check;
+                while((check!=1)&&(check!=2)){
+                    cout<<"Please enter 1 or 2 only for display all books or go to previouse menu respectively: ";
+                    cin>>check;
+                }
+                if(check==2){
+                    break;
+                }
+
+                admin.dis_student();                
+                break;
+
+            // case 'S':
+
+            //     bool stdchr;
+            //     break;
+
+            default:
+                cout<<"You have to enter only 'A', 'B', 'C', 'D', 'E', or 'Z' only for respective it's works!";
+                break;
+            }
+        }
+    }
+    else{
+
+        Student student;
+        char chr;
+
+        bool flag=1;
+
+        while(flag){
+            cout<<"What do you want?\n";
+            cout<<"For borrow the book, enter A \n";    
+            cout<<"For return the book, enter B \n";
+            cout<<"For close the menu, enter Z\n";
+            cin>>chr;
+            if(chr=='Z'){
+                break;
+            }
+            
+            string bid;
+
+            switch (chr)
+            {
+            case 'A':
+                while(1){
+
+                    int check;
+
+                    cout<<"For continue with borrow the book enter 1, for go to previouse menu enter 2: ";
+                    cin>>check;
+                    while((check!=1)&&(check!=2)){
+                        cout<<"Please enter 1 or 2 only for borrow the book or go to previouse menu respectively: ";
+                        cin>>check;
+                    }
+                    if(check==2){
+                        break;
+                    }
+
+                    cout<<"Enter id of the book: ";
+                    cin>>bid;
+                    if(student.isBookThere(bid)){
+                        student.borrow(id, bid);
+                    }
+                    else{
+                        cout<<"Book is not there in library!"<<endl;
+                    }
+
+                    student.displayBorrowedBooks(id);
+                }
+                break;
+
+            case 'B':
+            // addbook(string tit, string auth, string publish, string id, bool isava)
+                while(1){
+
+                    int check;
+
+                    cout<<"For continue with return the book enter 1, for go to previouse menu enter 2: ";
+                    cin>>check;
+                    while((check!=1)&&(check!=2)){
+                        cout<<"Please enter 1 or 2 only for return the book or go to previouse menu respectively: ";
+                        cin>>check;
+                    }
+                    if(check==2){
+                        break;
+                    }
+
+                    if(student.displayBorrowedBooks(id)){
+                        cout<<"Your borrowed books:\n";
+                        student.displayBorrowedBooks(id);
+                        cout<<"Enter id of the book: ";
+                        cin>>bid;
+                        student.returnBook(bid, id);
+                    }
+                    else{
+                        cout<<"You have not borrowed any book!"<<endl;
+                        break;
+                    }
+                }
+                break;
+            
+
+            default:
+                cout<<"You have to enter only 'A', 'B', or 'Z' only for respective it's works!";
+                break;
+            }
+        }
+    }
+
+    }
+    else{
+        cout<<"Please enter valid id!";
+    }
+
+
     return 0;
 }

@@ -258,7 +258,7 @@ public:
     }
     void display()
     {
-        cout << "Title : " << title << ", Author : " << author << ", Publication : " << publication << ", ISBN : " << isbn << ", Available : " << (isAvailable ? "Yes" : "No") << endl;
+       cout << left << setw(30) << title << setw(20) << author << setw(20) << publication << setw(10) << isbn << setw(5) << (isAvailable ? "Yes" : "No") << endl;
     }
     bool isBookThere(string id){
         string line;
@@ -268,12 +268,9 @@ public:
             string line;
             while (getline(readf, line))
             {   
-                istringstream iss(line);
-                string sid;
-                string name, email;
+                Book b = get_details(line);
 
-                getline(iss, sid, '\t');
-                if (sid == id)
+                if (b.isbn == id)
                 {
                     readf.close();
                     return true;
@@ -293,22 +290,23 @@ public:
 class Student : public Book
 {
 protected:
-    string studentId, name, email;
+    string studentId, name, email, password;
     vector<Book> borrowedBooks;
 
 public:
     Student() {};
-    Student(string ID, string n, string e) : studentId(ID), name(n), email(e) {}
+    Student(string ID, string n, string e, string pass) : studentId(ID), name(n), email(e), password(pass) {}
     Student get_student(const string &line)
     {
         istringstream iss(line);
-        string name, email, studentId;
+        string name, email, studentId, password;
 
         getline(iss, studentId, '\t');
         getline(iss, name, '\t');
         getline(iss, email, '\t');
+        getline(iss, password, '\t');
 
-        return Student(studentId, name, email);
+        return Student(studentId, name, email, password);
     }
     string to_string() const{
         return studentId + "\t" + name + "\t" + email;
@@ -339,59 +337,71 @@ public:
         return book_id;
     }
     bool isStudentRegistered(string id){
-    string line;
-    ifstream readf("students.txt");
-    if (readf.is_open())
-    {
         string line;
-        while (getline(readf, line))
-        {   
-            istringstream iss(line);
-            string sid;
-
-            getline(iss, sid, '\t');
-            if (sid == id)
-            {
-                readf.close();
-                return true;
+        ifstream readf("students.txt");
+        if (readf.is_open())
+        {
+            string line;
+            while (getline(readf, line))
+            {   
+                Student s = get_student(line);
+                if (s.studentId == id)
+                {
+                    readf.close();
+                    return true;
+                }
             }
+            readf.close();
         }
-        readf.close();
-    }
-    else
-    {
-        cerr << "Unable to open the file students.txt" << endl;
-    }
-    return false;
-}    
-bool isEmailRegistered(string email){
-    string line;
-    ifstream readf("students.txt");
-    if (readf.is_open())
-    {
-        string line;
-        while (getline(readf, line))
-        {   
-            istringstream iss(line);
-            string sid, name, semail;
-
-            getline(iss, sid, '\t');
-            getline(iss, name, '\t');
-            getline(iss, semail, '\t');
-            if (semail == email)
-            {
-                readf.close();
-                return true;
-            }
+        else
+        {
+            cerr << "Unable to open the file students.txt" << endl;
         }
-        readf.close();
-    }
-    else
-    {
-        cerr << "Unable to open the file students.txt" << endl;
-    }
     return false;
 }
+    bool isPasswordCorrect(string id, string pass){
+        ifstream readf("students.txt");
+        if (readf.is_open()){
+            string line;
+            while (getline(readf, line)){
+                Student s = get_student(line);
+                if (s.studentId == id && s.password == pass){
+                    readf.close();
+                    return true;
+                }
+            }
+            readf.close();
+            return false;
+        }
+        else{
+            cerr << "Unable to open the file students.txt" << endl;
+        }
+        return false;
+    }
+    bool isEmailRegistered(string email){
+        string line;
+        ifstream readf("students.txt");
+        if (readf.is_open())
+        {
+            string line;
+            while (getline(readf, line))
+            {   
+                Student s = get_student(line);
+
+                if (s.email == email)
+                {
+                    readf.close();
+                    return true;
+                }
+            }
+            readf.close();
+        }
+        else
+        {
+            cerr << "Unable to open the file students.txt" << endl;
+        }
+        return false;
+    }
     bool isBorrowed(string stu_id)
     {
         vector<string> list;
@@ -454,8 +464,7 @@ bool isEmailRegistered(string email){
     
     void studentDetails()
     {
-        cout << "Member Details : ";
-        cout << "Student ID : " << studentId << ", Name : " << name << ", Email : " << email << endl;
+        cout << left << setw(15) << studentId << setw(25) << name << setw(30) << email << endl;
     }
 };
 class Library : public Student
@@ -498,7 +507,7 @@ public:
         if(Dot>=email.length()-1) return 0;
         return 1;
     }
-    void addstudent(string studentId, string password, string name, string email)
+    void addstudent(string studentId, string name, string email, string password)
     {
         ofstream writef("students.txt", ios::app);
         if (writef.is_open())
@@ -511,7 +520,6 @@ public:
             cerr << "Unable to open the file " << endl;
         }
     }
-
     void removebook(string id){
         Book temp;
         vector<Book> books;
@@ -637,10 +645,31 @@ public:
 int main()
 {
 
-    string id;
+    string id, pass;
     cout<<"Enter you ID: ";
     cin>>id;
+
     Student temp;
+    int count=5;
+    while(count--){
+        cout<<"Enter your password: ";
+        cin>>pass;
+        if(temp.isPasswordCorrect(id, pass)){
+            break;
+        }
+        else if(count>0){
+            cout<<"Please enter correct password!";
+            cout<<endl;
+            if(count<=3 && count>0){
+                cout<<"You have only "<<count<<" attempts left!"<<endl;
+            }
+        }
+    }
+    
+    if(count<=0){
+        cout<<"You have entered wrong password 5 times, please try again later!"<<endl;
+        return 0;
+    }
 
     if(temp.isStudentRegistered(id)){
     
@@ -667,7 +696,7 @@ int main()
                 break;
             }
             
-            string tit, auth, publish, id, studentId, password, name, email, bid;
+            string tit, auth, publish, id, studentId, name, email, password, bid, check;
             bool isava;
 
             switch (chr)
@@ -676,15 +705,14 @@ int main()
             // addbook(string tit, string auth, string publish, string id, bool isava)
                 while(1){
 
-                    int check;
 
                     cout<<"For continue with add book enter 1, for go to previouse menu enter 2: ";
                     cin>>check;
-                    while((check!=1)&&(check!=2)){
+                    while((check!="1")&&(check!="2")){
                         cout<<"Please enter 1 or 2 only for add book or go to previouse menu respectively: ";
                         cin>>check;
                     }
-                    if(check==2){
+                    if(check=="2"){
                         break;
                     }
 
@@ -719,15 +747,14 @@ int main()
                 
                 while(1){
 
-                    int check;
 
                     cout<<"For continue with add student enter 1, for go to previouse menu enter 2: ";
                     cin>>check;
-                    while((check!=1)&&(check!=2)){
+                    while((check!="1")&&(check!="2")){
                         cout<<"Please enter 1 or 2 only for add student or go to previouse menu respectively: ";
                         cin>>check;
                     }
-                    if(check==2){
+                    if(check=="2"){
                         break;
                     }
 
@@ -747,9 +774,6 @@ int main()
                     cin.ignore();
                     getline(cin, name);
 
-                    cout<<"Enter password for the student " << name << " : ";
-                    getline(cin, password);
-
                     while(1){
                         cout<<"Enter email of the student: ";
                         cin>>email;
@@ -764,22 +788,26 @@ int main()
                         }
                     }
 
-                    admin.addstudent(studentId, password, name, email);
+                    cout<<"Enter password for the student " << name << " : ";
+                    cin.ignore();
+                    getline(cin, password);
+
+
+                    admin.addstudent(studentId, name, email, password);
                 }
                     break;
             
             case 'c':
                 while(1){
 
-                    int check;
 
                     cout<<"For continue with remove book enter 1, for go to previouse menu enter 2: ";
                     cin>>check;
-                    while((check!=1)&&(check!=2)){
+                    while((check!="1")&&(check!="2")){
                         cout<<"Please enter 1 or 2 only for remove book or go to previouse menu respectively: ";
                         cin>>check;
                     }
-                    if(check==2){
+                    if(check=="2"){
                         break;
                     }
 
@@ -803,15 +831,14 @@ int main()
                 
                 while(1){
 
-                    int check;
 
                     cout<<"For continue with remove student enter 1, for go to previouse menu enter 2: ";
                     cin>>check;
-                    while((check!=1)&&(check!=2)){
+                    while((check!="1")&&(check!="2")){
                         cout<<"Please enter 1 or 2 only for remove student or go to previouse menu respectively: ";
                         cin>>check;
                     }
-                    if(check==2){
+                    if(check=="2"){
                         break;
                     }
 
@@ -839,15 +866,14 @@ int main()
 
                 while(1){
 
-                    int check;
 
                     cout<<"For continue with search the book, enter 1, for go to previouse menu enter 2: ";
                     cin>>check;
-                    while((check!=1)&&(check!=2)){
+                    while((check!="1")&&(check!="2")){
                         cout<<"Please enter 1 or 2 only for search the book or go to previouse menu respectively: ";
                         cin>>check;
                     }
-                    if(check==2){
+                    if(check=="2"){
                         break;
                     }
 
@@ -859,34 +885,37 @@ int main()
             
             case 'f':
 
-                int check;
-
                 cout<<"For continue with display all books, enter 1; for go to previouse menu enter 2: ";
                 cin>>check;
-                while((check!=1)&&(check!=2)){
+                while((check!="1")&&(check!="2")){
                     cout<<"Please enter 1 or 2 only for display all books or go to previouse menu respectively: ";
                     cin>>check;
                 }
 
-                if(check==2){
+                if(check=="2"){
                     break;
                 }
-                admin.dis_book();                
+                cout << left << setw(30) << "Title" << setw(20) << "Author" << setw(20) << "Publication" << setw(10) << "ISBN" << setw(5) << "Available" << endl;
+                cout << string(95, '-') << endl;
+                admin.dis_book();
+                cout<<endl;
                 break;
             
             case 'g':
 
                 cout<<"For continue with display all books, enter 1; for go to previouse menu enter 2: ";
                 cin>>check;
-                while((check!=1)&&(check!=2)){
+                while((check!="1")&&(check!="2")){
                     cout<<"Please enter 1 or 2 only for display all books or go to previouse menu respectively: ";
                     cin>>check;
                 }
-                if(check==2){
+                if(check=="2"){
                     break;
                 }
-
-                admin.dis_student();                
+                cout << left << setw(15) << "Student ID" << setw(25) << "Name" << setw(30) << "Email" << endl;
+                cout << string(70, '-') << endl;
+                admin.dis_student();
+                cout<<endl;
                 break;
 
             // case 'S':
@@ -918,22 +947,20 @@ int main()
                 break;
             }
             
-            string bid;
+            string bid, check;
 
             switch (chr)
             {
             case 'a':
                 while(1){
 
-                    int check;
-
                     cout<<"For continue with borrow the book enter 1, for go to previouse menu enter 2: ";
                     cin>>check;
-                    while((check!=1)&&(check!=2)){
+                    while((check!="1")&&(check!="2")){
                         cout<<"Please enter 1 or 2 only for borrow the book or go to previouse menu respectively: ";
                         cin>>check;
                     }
-                    if(check==2){
+                    if(check=="2"){
                         break;
                     }
 
@@ -945,32 +972,41 @@ int main()
                     else{
                         cout<<"Book is not there in library!"<<endl;
                     }
-
+                    cout<<"Your current borrowed books:\n";
+                    cout << left << setw(30) << "Title" << setw(20) << "Author" << setw(20) << "Publication" << setw(10) << "ISBN" << setw(5) << "Available" << endl;
+                    cout << string(95, '-') << endl;    
                     student.displayBorrowedBooks(id);
+                    cout<<endl;
                 }
                 break;
 
             case 'b':
                 while(1){
 
-                    int check;
-
                     cout<<"For continue with return the book enter 1, for go to previouse menu enter 2: ";
                     cin>>check;
-                    while((check!=1)&&(check!=2)){
+                    while((check!="1")&&(check!="2")){
                         cout<<"Please enter 1 or 2 only for return the book or go to previouse menu respectively: ";
                         cin>>check;
                     }
-                    if(check==2){
+                    if(check=="2"){
                         break;
                     }
 
                     if(student.isBorrowed(id)){
-                        cout<<"Your borrowed books:\n";
+                        cout<<"Your current borrowed books:\n";
+                        cout << left << setw(30) << "Title" << setw(20) << "Author" << setw(20) << "Publication" << setw(10) << "ISBN" << setw(5) << "Available" << endl;
+                        cout << string(95, '-') << endl;    
                         student.displayBorrowedBooks(id);
+                        cout<<endl;
                         cout<<"Enter id of the book: ";
                         cin>>bid;
                         student.returnBook(bid, id);
+                        cout<<"Your current borrowed books:\n";
+                        cout << left << setw(30) << "Title" << setw(20) << "Author" << setw(20) << "Publication" << setw(10) << "ISBN" << setw(5) << "Available" << endl;
+                        cout << string(95, '-') << endl;    
+                        student.displayBorrowedBooks(id);
+                        cout<<endl;
                     }
                     else{
                         cout<<"You have not borrowed any book!"<<endl;
@@ -981,21 +1017,23 @@ int main()
             
 
             case 'c':
-                int check;
 
                 cout<<"For continue with display borrowed books enter 1, for go to previouse menu enter 2: ";
                 cin>>check;
-                while((check!=1)&&(check!=2)){
+                while((check!="1")&&(check!="2")){
                     cout<<"Please enter 1 or 2 only for display borrowed books or go to previouse menu respectively: ";
                     cin>>check;
                 }
-                if(check==2){
+                if(check=="2"){
                     break;
                 }
 
                 if(student.isBorrowed(id)){
-                    cout<<"Your borrowed books:\n";
+                    cout<<"Your current borrowed books:\n";
+                    cout << left << setw(30) << "Title" << setw(20) << "Author" << setw(20) << "Publication" << setw(10) << "ISBN" << setw(5) << "Available" << endl;
+                    cout << string(95, '-') << endl;    
                     student.displayBorrowedBooks(id);
+                    cout<<endl;
                 }
                 else{
                     cout<<"You have not borrowed any book!"<<endl;

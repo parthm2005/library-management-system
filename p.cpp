@@ -363,6 +363,34 @@ public:
         cerr << "Unable to open the file students.txt" << endl;
     }
     return false;
+}    
+bool isEmailRegistered(string email){
+    string line;
+    ifstream readf("students.txt");
+    if (readf.is_open())
+    {
+        string line;
+        while (getline(readf, line))
+        {   
+            istringstream iss(line);
+            string sid, name, semail;
+
+            getline(iss, sid, '\t');
+            getline(iss, name, '\t');
+            getline(iss, semail, '\t');
+            if (semail == email)
+            {
+                readf.close();
+                return true;
+            }
+        }
+        readf.close();
+    }
+    else
+    {
+        cerr << "Unable to open the file students.txt" << endl;
+    }
+    return false;
 }
     bool isBorrowed(string stu_id)
     {
@@ -447,6 +475,28 @@ public:
         {
             cerr << "Unable to open the file " << endl;
         }
+    }
+    bool isChar(char c)
+    {
+        return ((c>='A' && c<='Z')||(c>='a'&&c<='z')||(c>='0'&&c<='9')||c=='@'||c=='.');
+    }
+    bool isEmailValid(string email)
+    {
+        if(email[0]=='@') return 0;
+        if(!isChar(email[0])) return 0;
+        int At=-1,Dot=-1;
+        for(int i=0;i<email.length();i++)
+        {
+            if(!isChar(email[i])) return 0;
+            if(email[i]=='@'&& At==-1) At=i;
+            else if(email[i]=='@' && At!=-1) return 0;
+            else if(email[i]=='.' && Dot!=i-1) Dot=i;
+            else if(email[i]=='.' && Dot==i-1) return 0;
+        }
+        if(At==-1 || Dot==-1) return 0;
+        if(At>Dot||At+1==Dot) return 0;
+        if(Dot>=email.length()-1) return 0;
+        return 1;
     }
     void addstudent(string studentId, string password, string name, string email)
     {
@@ -698,11 +748,21 @@ int main()
                     getline(cin, name);
 
                     cout<<"Enter password for the student " << name << " : ";
-                    cin.ignore();
                     getline(cin, password);
 
-                    cout<<"Enter email of the student: ";
-                    cin>>email;
+                    while(1){
+                        cout<<"Enter email of the student: ";
+                        cin>>email;
+                        if(admin.isEmailRegistered(email)){
+                            cout<<"This Email is already registed with different student, Kindly register with different email!"<<endl;
+                        }
+                        else if(!admin.isEmailValid(email)){
+                            cout<<"Please enter valid email address!"<<endl;
+                        }
+                        else{
+                            break;
+                        }
+                    }
 
                     admin.addstudent(studentId, password, name, email);
                 }

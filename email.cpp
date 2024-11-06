@@ -4,7 +4,7 @@ bool isChar(char c)
 {
     return ((c>='A' && c<='Z')||(c>='a'&&c<='z')||(c>='0'&&c<='9')||c=='@'||c=='.');
 }
-bool isValid(string email)
+bool isEmailValid(string email)
 {
     if(email[0]=='@') return 0;
     if(!isChar(email[0])) return 0;
@@ -26,7 +26,7 @@ int main()
 {   
     string email;
     cin>>email;
-    int x=isValid(email);
+    int x=isEmailValid(email);
     cout<<x<<endl;
 
     main();

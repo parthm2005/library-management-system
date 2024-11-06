@@ -1,7 +1,6 @@
-34i	Prankit	prankvish@gmail.com
-123	Nevil	nevil@gmail.com
-12i	parth	parth@gmail.com
-132k	Prnkit	prankit@gmail.com
-456i	Nevil Vataliya	abcd123@gmail.com
-120	Shahil	shahil@gmail.com
-1	abcd xyz	pyq@stu.com
+34i	Prankit	prankvish@gmail.com 123
+123	Nevil	nevil@gmail.com 123
+12i	parth	parth@gmail.com 123
+132k	Prnkit	prankit@gmail.com 123
+456i	Nevil Vataliya	abcd123@gmail.com 123
+120	Shahil	shahil@gmail.com 123

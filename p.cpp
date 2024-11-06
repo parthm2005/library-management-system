@@ -448,12 +448,12 @@ public:
             cerr << "Unable to open the file " << endl;
         }
     }
-    void addstudent(string studentId, string name, string email)
+    void addstudent(string studentId, string password, string name, string email)
     {
         ofstream writef("students.txt", ios::app);
         if (writef.is_open())
         {
-            writef << studentId << "\t" << name << "\t" << email << "\n";
+            writef << studentId << "\t"  << name << "\t" << email << "\t" << password << "\n";
             writef.close();
         }
         else
@@ -617,7 +617,7 @@ int main()
                 break;
             }
             
-            string tit, auth, publish, id, studentId, name, email, bid;
+            string tit, auth, publish, id, studentId, password, name, email, bid;
             bool isava;
 
             switch (chr)
@@ -697,10 +697,14 @@ int main()
                     cin.ignore();
                     getline(cin, name);
 
+                    cout<<"Enter password for the student " << name << " : ";
+                    cin.ignore();
+                    getline(cin, password);
+
                     cout<<"Enter email of the student: ";
                     cin>>email;
 
-                    admin.addstudent(studentId, name, email);
+                    admin.addstudent(studentId, password, name, email);
                 }
                     break;
             

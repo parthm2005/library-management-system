@@ -645,11 +645,20 @@ public:
 int main()
 {
 
-    string id, pass;
-    cout<<"Enter you ID: ";
-    cin>>id;
-
     Student temp;
+    string id, pass;
+    
+    while(1){
+        cout<<"Enter you ID: ";
+        cin>>id;
+            if(temp.isStudentRegistered(id)){
+                break;
+            }
+            else{
+                cout<<"Please enter valid id!"<<endl;
+            }
+    }
+
     int count=5;
     while(count--){
         cout<<"Enter your password: ";
@@ -671,7 +680,7 @@ int main()
         return 0;
     }
 
-    if(temp.isStudentRegistered(id)){
+
     
     if(id=="123"){
 
@@ -1049,10 +1058,6 @@ int main()
         }
     }
 
-    }
-    else{
-        cout<<"Please enter valid id!";
-    }
 
 
     return 0;

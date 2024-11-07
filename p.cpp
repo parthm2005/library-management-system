@@ -1,6 +1,11 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+class LibraryEntity{
+    public:
+        Book get_details(const string& line);
+};
+
 class Book
 {
 protected:
@@ -261,7 +266,6 @@ public:
        cout << left << setw(30) << title << setw(20) << author << setw(20) << publication << setw(10) << isbn << setw(5) << (isAvailable ? "Yes" : "No") << endl;
     }
     bool isBookThere(string id){
-        string line;
         ifstream readf("books.txt");
         if (readf.is_open())
         {
@@ -467,6 +471,7 @@ public:
         cout << left << setw(15) << studentId << setw(25) << name << setw(30) << email << endl;
     }
 };
+
 class Library : public Student
 {
 public:
@@ -559,7 +564,6 @@ public:
             cout<<"Book not found in the library."<<endl;
         } 
     }
-
     void removestudent(string id){
         vector<Student> students;
         if(isStudentRegistered(id)){
@@ -597,8 +601,7 @@ public:
         else{
             cout<<"Student not found."<<endl;
         } 
-    }
-    
+    } 
     void searchbook(string id)
     {
         Available(id);
@@ -642,12 +645,14 @@ public:
         }
     }
 };
+
+
 int main()
 {
 
     Student temp;
     string id, pass;
-    
+
     while(1){
         cout<<"Enter you ID: ";
         cin>>id;

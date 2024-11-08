@@ -10,282 +10,280 @@ protected:
 public:
     Book() {};
     Book(string t, string a, string p, string id, bool status) : title(t), author(a), publication(p), isbn(id), isAvailable(status) {}
-    Book get_details(const string &line)
+    Book get_details(const string &line);
+    string to_string() const;
+    void borrow(string sid, string bid);
+    void returnBook(string bid, string sid);
+    void Available(string id);
+    void borrowed_books(string id);
+    friend ostream &operator<<(ostream &os, const Book &book);
+    bool isBookThere(string id);
+};
+
+Book Book::get_details(const string &line)
+{
+    istringstream iss(line);
+    string title, author, isbn, publication, isava;
+    bool isavailable;
+    getline(iss, isbn, '\t');
+    getline(iss, title, '\t');
+    getline(iss, author, '\t');
+    getline(iss, publication, '\t');
+    getline(iss, isava, '\t');
+
+    isava == "1" ? isavailable = true : isavailable = false;
+    return Book(title, author, publication, isbn, isavailable);
+}
+
+string Book::to_string() const
+{
+    return isbn + "\t" + title + "\t" + author + "\t" + publication + "\t" + (isAvailable ? "1" : "0");
+}
+
+void Book::borrow(string sid, string bid)
+{
+    bool isav = false;
+
+    vector<Book> books;
+    ifstream readf("books.txt");
+
+    if (readf.is_open())
     {
-        istringstream iss(line);
-        string title, author, isbn, publication, isava;
-        bool isavailable;
-        getline(iss, isbn, '\t');
-        getline(iss, title, '\t');
-        getline(iss, author, '\t');
-        getline(iss, publication, '\t');
-        getline(iss, isava, '\t');
-
-        isava == "1" ? isavailable = true : isavailable = false;
-        return Book(title, author, publication, isbn, isavailable);
-    }
-    string to_string() const
-    {
-        return isbn + "\t" + title + "\t" + author + "\t" + publication + "\t" + (isAvailable ? "1" : "0");
-    }
-    void borrow(string sid, string bid)
-
-    {
-        bool isav = false;
-
-        vector<Book> books;
-        ifstream readf("books.txt");
-
-        if (readf.is_open())
-
-        {
-
-            bool flag = false;
-            string line;
-            while (getline(readf, line))
-
-            {
-
-                Book b = get_details(line);
-                if (b.isbn == bid)
-
-                {
-
-                    if (b.isAvailable)
-
-                    {
-
-                        std::ofstream file("bothids.txt", std::ios::app);
-
-                        if (!file)
-
-                        {
-
-                            std::cerr << "Error opening file." << std::endl;
-
-                            exit;
-                        }
-
-                        file << sid << "\t" << bid << endl;
-
-                        file.close();
-                        isav = true;
-                        b.isAvailable = false;
-                    }
-
-                    else
-
-                    {
-
-                        cout << "Book is not availabale to borrow." << endl;
-
-                        // return 2;
-                    }
-
-                    flag = true;
-                }
-                books.push_back(b);
-            }
-            if (!flag)
-
-            {
-
-                cout << "Book not found" << endl;
-
-                // return -123;
-            }
-
-            readf.close();
-        }
-        if (isav)
-        {
-            ofstream writef("books.txt", ios::trunc); // Open with truncate mode to overwrite
-            if (!writef.is_open())
-            {
-                cout << "Unable to open books.txt for writing" << endl;
-                return;
-            }
-            for (const auto &book : books)
-            {
-                writef << book.to_string() << endl;
-            }
-            writef.close();
-            cout << "Book borrowed successfully." << endl;
-        }
-
-        else
-
-        {
-
-            cout << "unable to open" << endl;
-        }
-    }
-    void returnBook(string bid,string sid)
-    {
-        vector<Book> books;
-        bool found=false;
-        bool returned = false;
-        ifstream readf("books.txt");
-        if(!readf.is_open()){
-            cout<<"Unable to open book.txt wed"<<endl;
-            return ;
-        }
-        else{
-            string line;
-            while(getline(readf,line)){
-                Book b = get_details(line);
-                if(b.isbn==bid){
-                    found=true;
-                    if(!b.isAvailable){
-                        b.isAvailable=true;
-                        returned = true;
-                    }
-                    else{
-                        cout<<"You can't return book which you have not! Book is already available in the library"<<endl;
-                    }
-                }
-                books.push_back(b);
-            }
-            readf.close();
-        }
-        if(returned){
-            ofstream writef("books.txt",ios::trunc);
-            if(!writef.is_open()){
-                cout<<"Unable to open books.txt for writing "<<endl;
-                return;
-            }
-            for(const auto &book:books){
-                writef<<book.to_string()<<endl;
-            }
-            writef.close();
-            cout<<"Book returned successfully "<<endl;
-        }
-        if(returned){
-            ifstream readf("bothids.txt");
-            vector<string>updated_enteries;
-            if(!readf.is_open()){
-                cout<<"Unable to open bothids.txt "<<endl;
-                return;
-            }
-            string line;
-            while(getline(readf,line)){
-                istringstream iss(line);
-                string ssid,sbid;
-                getline(iss,ssid,'\t');
-                getline(iss,sbid,'\t');
-
-                if(!(ssid==sid && sbid==bid)){
-                    updated_enteries.push_back(line);
-                }
-            }
-            readf.close();
-
-            ofstream writef("bothids.txt",ios::trunc);
-            if(!writef.is_open()){
-                cout<<"Unable to open bothids.txt to write "<<endl;
-                return;
-            }
-            for(const auto &entry : updated_enteries){
-                writef<<entry<<endl;
-            }
-            writef.close();
-            cout<<"Updated the bothids.txt file "<<endl;
-        }
-        else if(!found){
-            cout<<"Book not found in the library "<<endl;
-        }
-    }
-    void Available(string id)
-    {
-        ifstream readf("books.txt");
-        if (readf.is_open())
-        {
-            bool flag = false;
-            string line;
-            while (getline(readf, line))
-            {
-                Book book = get_details(line);
-                if (book.isbn == id)
-                {
-                    if (book.isAvailable)
-                    {
-
-                        book.display();
-                        // return book.isAvailable;
-                    }
-                    else
-                    {
-                        cout << "Book is not availabale" << endl;
-                        // return 2;
-                    }
-                    flag = true;
-                }
-            }
-            if (!flag)
-            {
-                cout << "Book not found" << endl;
-                // return -1;
-            }
-
-            readf.close();
-        }
-        else
-        {
-            cout << "unable to open" << endl;
-        }
-    }
-    void borrowed_books(string id)
-    {
-        ifstream readf("books.txt");
-        if (readf.is_open())
-        {
-            string line;
-            while (getline(readf, line))
-            {
-                Book book = get_details(line);
-                if (book.isbn == id)
-                {
-                    book.display();
-                }
-            }
-
-            readf.close();
-        }
-        else
-        {
-            cout << "unable to open" << endl;
-        }
-    }
-    void display()
-    {
-       cout << left << setw(30) << title << setw(20) << author << setw(20) << publication << setw(10) << isbn << setw(5) << (isAvailable ? "Yes" : "No") << endl;
-    }
-    bool isBookThere(string id){
+        bool flag = false;
         string line;
-        ifstream readf("books.txt");
-        if (readf.is_open())
+        while (getline(readf, line))
         {
-            string line;
-            while (getline(readf, line))
-            {   
-                Book b = get_details(line);
-
-                if (b.isbn == id)
+            Book b = get_details(line);
+            if (b.isbn == bid)
+            {
+                if (b.isAvailable)
                 {
-                    readf.close();
-                    return true;
+                    std::ofstream file("bothids.txt", std::ios::app);
+                    if (!file)
+                    {
+                        std::cerr << "Error opening file." << std::endl;
+                        exit;
+                    }
+                    file << sid << "\t" << bid << endl;
+                    file.close();
+                    isav = true;
+                    b.isAvailable = false;
+                }
+                else
+                {
+                    cout << "Book is not availabale to borrow." << endl;
+                }
+                flag = true;
+            }
+            books.push_back(b);
+        }
+        if (!flag)
+        {
+            cout << "Book not found" << endl;
+        }
+        readf.close();
+    }
+    if (isav)
+    {
+        ofstream writef("books.txt", ios::trunc); // Open with truncate mode to overwrite
+        if (!writef.is_open())
+        {
+            cout << "Unable to open books.txt for writing" << endl;
+            return;
+        }
+        for (const auto &book : books)
+        {
+            writef << book.to_string() << endl;
+        }
+        writef.close();
+        cout << "Book borrowed successfully." << endl;
+    }
+    else
+    {
+        cout << "unable to open" << endl;
+    }
+}
+
+void Book::returnBook(string bid, string sid)
+{
+    vector<Book> books;
+    bool found = false;
+    bool returned = false;
+    ifstream readf("books.txt");
+    if (!readf.is_open())
+    {
+        cout << "Unable to open book.txt" << endl;
+        return;
+    }
+    else
+    {
+        string line;
+        while (getline(readf, line))
+        {
+            Book b = get_details(line);
+            if (b.isbn == bid)
+            {
+                found = true;
+                if (!b.isAvailable)
+                {
+                    b.isAvailable = true;
+                    returned = true;
+                }
+                else
+                {
+                    cout << "You can't return book which you have not! Book is already available in the library" << endl;
                 }
             }
-            readf.close();
-            return false;
+            books.push_back(b);
         }
-        else
+        readf.close();
+    }
+    if (returned)
+    {
+        ofstream writef("books.txt", ios::trunc);
+        if (!writef.is_open())
         {
-            cerr << "Unable to open the file students.txt" << endl;
+            cout << "Unable to open books.txt for writing " << endl;
+            return;
         }
+        for (const auto &book : books)
+        {
+            writef << book.to_string() << endl;
+        }
+        writef.close();
+        cout << "Book with "<<bid<<" id  returned successfully " << endl;
+    }
+    if (returned)
+    {
+        ifstream readf("bothids.txt");
+        vector<string> updated_enteries;
+        if (!readf.is_open())
+        {
+            cout << "Unable to open bothids.txt " << endl;
+            return;
+        }
+        string line;
+        while (getline(readf, line))
+        {
+            istringstream iss(line);
+            string ssid, sbid;
+            getline(iss, ssid, '\t');
+            getline(iss, sbid, '\t');
+
+            if (!(ssid == sid && sbid == bid))
+            {
+                updated_enteries.push_back(line);
+            }
+        }
+        readf.close();
+
+        ofstream writef("bothids.txt", ios::trunc);
+        if (!writef.is_open())
+        {
+            cout << "Unable to open bothids.txt to write " << endl;
+            return;
+        }
+        for (const auto &entry : updated_enteries)
+        {
+            writef << entry << endl;
+        }
+        writef.close();
+        cout << "Updated the bothids.txt file " << endl;
+    }
+    else if (!found)
+    {
+        cout << "Book not found in the library " << endl;
+    }
+}
+
+void Book::Available(string id)
+{
+    ifstream readf("books.txt");
+    if (readf.is_open())
+    {
+        bool flag = false;
+        string line;
+        while (getline(readf, line))
+        {
+            Book book = get_details(line);
+            if (book.isbn == id)
+            {
+                if (book.isAvailable)
+                {
+                    cout << book;
+                }
+                else
+                {
+                    cout << "Book is not availabale" << endl;
+                }
+                flag = true;
+            }
+        }
+        if (!flag)
+        {
+            cout << "Book not found" << endl;
+        }
+        readf.close();
+    }
+    else
+    {
+        cout << "unable to open" << endl;
+    }
+}
+
+void Book::borrowed_books(string id)
+{
+    ifstream readf("books.txt");
+    if (readf.is_open())
+    {
+        string line;
+        while (getline(readf, line))
+        {
+            Book book = get_details(line);
+            if (book.isbn == id)
+            {
+                cout << book;
+            }
+        }
+        readf.close();
+    }
+    else
+    {
+        cout << "unable to open" << endl;
+    }
+}
+
+ostream &operator<<(ostream &os, const Book &book)
+{
+    os << left << setw(30) << book.title << setw(20) << book.author << setw(20) << book.publication << setw(10) << book.isbn << setw(5) << (book.isAvailable ? "Yes" : "No") << endl;
+    return os;
+}
+
+bool Book::isBookThere(string id)
+{
+    string line;
+    ifstream readf("books.txt");
+    if (readf.is_open())
+    {
+        string line;
+        while (getline(readf, line))
+        {
+            Book b = get_details(line);
+            if (b.isbn == id)
+            {
+                readf.close();
+                return true;
+            }
+        }
+        readf.close();
         return false;
     }
-};
+    else
+    {
+        cerr << "Unable to open the file students.txt" << endl;
+    }
+    return false;
+}
 
 class Student : public Book
 {
@@ -309,7 +307,7 @@ public:
         return Student(studentId, name, email, password);
     }
     string to_string() const{
-        return studentId + "\t" + name + "\t" + email;
+        return studentId + "\t" + name + "\t" + email + "\t" + password;
     }
     // void borrowBook(Book &book)
     // {
@@ -431,7 +429,32 @@ public:
         }
         return chk;
     }
-    
+    void returnAllBook(string id){
+        vector<string> list;
+        ifstream readf("bothids.txt");
+        if (readf.is_open())
+        {
+            string line;
+            while (getline(readf, line))
+            {
+                string p = "";
+                string b = get_mem_books(line, p);
+                if (p == id)
+                {
+                    list.push_back(b);
+                }
+            }
+            readf.close();
+        }
+        else
+        {
+            cout << "unable to open" << endl;
+        }
+        for (auto it : list)
+        {
+            returnBook(it, id);
+        }
+    }
     void displayBorrowedBooks(string stu_id)
     {
         vector<string> list;
@@ -462,9 +485,13 @@ public:
         }
     }
     
-    void studentDetails()
+    friend ostream &operator<<(ostream &os, const Student &student)
     {
-        cout << left << setw(15) << studentId << setw(25) << name << setw(30) << email << endl;
+        if (student.studentId != "123")
+        {
+            os << left << setw(15) << student.studentId << setw(25) << student.name << setw(30) << student.email << endl;
+        }
+        return os;
     }
 };
 class Library : public Student
@@ -552,11 +579,11 @@ public:
                 writef<<book.to_string()<<endl;
             }
             writef.close();
-            cout<<"Book removed successfully!"<<endl;
+            cout<<"Book with "<<id<<" id removed successfully!"<<endl;
         }
         
         else{
-            cout<<"Book not found in the library."<<endl;
+            cout<<"Book with "<<id<<" id not found in the library."<<endl;
         } 
     }
 
@@ -569,6 +596,36 @@ public:
                 return ;
             }
             else{
+                if(id=="123"){
+                    cout<<"You can not remove admin!"<<endl;
+                    return;
+                }
+                if(isBorrowed(id)){
+                    cout<<"You can only remove student after returning all borrowed books!"<<endl;
+                    cout<<"borrowed books are:"<<endl;
+                    displayBorrowedBooks(id);
+                }
+                while(1){
+                    if(isBorrowed(id)){
+                        cout<<"Do you want to return all borrowed books? (y/n): ";
+                        string response;
+                        cin>>response;
+                        if(response == "y" || response == "Y" || response == "yes" || response == "Yes" || response == "YES"){
+                            returnAllBook(id);
+                            break;
+                        }
+                        else if(response == "n" || response == "N" || response == "no" || response == "No" || response == "No"){
+                            cout<<"You can not remove student without returning all borrowed books!"<<endl;
+                            return;
+                        }
+                        else{
+                            cout<<"Please enter valid input!"<<endl;
+                        }
+                    }
+                    else{
+                        break;
+                    }
+                }
                 string line;
                 while(getline(readf,line)){
                     Student s = get_student(line);
@@ -591,7 +648,7 @@ public:
                 writef<<student.to_string()<<endl;
             }
             writef.close();
-            cout<<"Student removed successfully!"<<endl;
+            cout<<"Student with "<<id<<" id removed successfully!"<<endl;
         }
         
         else{
@@ -613,7 +670,7 @@ public:
             while (getline(readf, line))
             {
                 Book book = get_details(line);
-                book.display();
+                cout << book;
             }
             readf.close();
         }
@@ -632,7 +689,7 @@ public:
             while (getline(readf, line))
             {
                 Student student = get_student(line);
-                student.studentDetails();
+                cout << student;
             }
             readf.close();
         }
@@ -642,48 +699,11 @@ public:
         }
     }
 };
-int main()
-{
-
-    Student temp;
-    string id, pass;
-    
-    while(1){
-        cout<<"Enter you ID: ";
-        cin>>id;
-            if(temp.isStudentRegistered(id)){
-                break;
-            }
-            else{
-                cout<<"Please enter valid id!"<<endl;
-            }
-    }
-
-    int count=5;
-    while(count--){
-        cout<<"Enter your password: ";
-        cin>>pass;
-        if(temp.isPasswordCorrect(id, pass)){
-            break;
-        }
-        else if(count>0){
-            cout<<"Please enter correct password!";
-            cout<<endl;
-            if(count<=3 && count>0){
-                cout<<"You have only "<<count<<" attempts left!"<<endl;
-            }
-        }
-    }
-    
-    if(count<=0){
-        cout<<"You have entered wrong password 5 times, please try again later!"<<endl;
-        return 0;
-    }
 
 
-    
-    if(id=="123"){
-
+void menu(){
+        string id="123";
+        string pass="1111";
         Library admin;
         char chr;
 
@@ -736,15 +756,30 @@ int main()
                         }
                     }
 
-                    cout<<"Enter title of the book: ";
-                    cin.ignore();
-                    getline(cin, tit);
+                    do {
+                        cout<<"Enter title of the book: ";
+                        cin.ignore();
+                        getline(cin, tit);
+                        if (tit.empty()) {
+                            cout << "Title cannot be empty. Please enter a valid title." << endl;
+                        }
+                    } while (tit.empty());
 
-                    cout<<"Enter author of the book: ";
-                    getline(cin, auth);
+                    do {
+                        cout<<"Enter author of the book: ";
+                        getline(cin, auth);
+                        if (auth.empty()) {
+                            cout << "Author name cannot be empty. Please enter a valid author name." << endl;
+                        }
+                    } while (auth.empty());
 
-                    cout<<"Enter publisher name of the book: ";
-                    getline(cin, publish);
+                    do {
+                        cout<<"Enter publisher name of the book: ";
+                        getline(cin, publish);
+                        if (publish.empty()) {
+                            cout << "Publisher name cannot be empty. Please enter a valid publisher name." << endl;
+                        }
+                    } while (publish.empty());
 
 
                     admin.addbook(tit, auth, publish, id, 1);
@@ -779,9 +814,14 @@ int main()
                         }
                     }
 
-                    cout<<"Enter name of the student: ";
-                    cin.ignore();
-                    getline(cin, name);
+                    do {
+                        cout<<"Enter name of the student: ";
+                        cin.ignore();
+                        getline(cin, name);
+                        if (name.empty()) {
+                            cout << "Name cannot be empty. Please enter a valid name." << endl;
+                        }
+                    } while (name.empty());
 
                     while(1){
                         cout<<"Enter email of the student: ";
@@ -797,10 +837,14 @@ int main()
                         }
                     }
 
-                    cout<<"Enter password for the student " << name << " : ";
-                    cin.ignore();
-                    getline(cin, password);
-
+                    do {
+                        cout<<"Enter password for the student " << name << " : ";
+                        cin.ignore();
+                        getline(cin, password);
+                        if (password.empty()) {
+                            cout << "Password cannot be empty. Please enter a valid password." << endl;
+                        }
+                    } while (password.empty());
 
                     admin.addstudent(studentId, name, email, password);
                 }
@@ -912,10 +956,10 @@ int main()
             
             case 'g':
 
-                cout<<"For continue with display all books, enter 1; for go to previouse menu enter 2: ";
+                cout<<"For continue with display all students, enter 1; for go to previouse menu enter 2: ";
                 cin>>check;
                 while((check!="1")&&(check!="2")){
-                    cout<<"Please enter 1 or 2 only for display all books or go to previouse menu respectively: ";
+                    cout<<"Please enter 1 or 2 only for display all students or go to previouse menu respectively: ";
                     cin>>check;
                 }
                 if(check=="2"){
@@ -938,9 +982,9 @@ int main()
             }
         }
     }
-    else{
 
-        Student student;
+void menu(string id, string password){
+    Student student;
         char chr;
 
         bool flag=1;
@@ -1058,7 +1102,52 @@ int main()
         }
     }
 
+int main()
+{
+
+    Student temp;
+    string id, pass;
+    
+    while(1){
+        cout<<"Enter you ID: ";
+        cin>>id;
+            if(temp.isStudentRegistered(id)){
+                break;
+            }
+            else{
+                cout<<"Please enter valid id!"<<endl;
+            }
+    }
+
+    int count=5;
+    while(count--){
+        cout<<"Enter your password: ";
+        cin>>pass;
+        if(temp.isPasswordCorrect(id, pass)){
+            break;
+        }
+        else if(count>0){
+            cout<<"Please enter correct password!";
+            cout<<endl;
+            if(count<=3 && count>0){
+                cout<<"You have only "<<count<<" attempts left!"<<endl;
+            }
+        }
+    }
+    
+    if(count<=0){
+        cout<<"You have entered wrong password 5 times, please try again later!"<<endl;
+        return 0;
+    }
 
 
+    
+    if(id=="123"){
+            menu();
+    }
+    else{
+            menu(id, pass);
+    }
+    
     return 0;
 }

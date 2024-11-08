@@ -1,6 +1,6 @@
 123	admin	admin@gmail.com	1111
-1	test	testing@gmail.com	1
 U23CS113	Prankit	prankit@gmail.com	123
 U23CS158	Nevil	nevil@gmail.com	123
 U23CS107	Parth	parth@gmail.com	123
 U23CS120	Shahil	Shahil@gmail.com	123
+U23CS109	Devil Singh	devil@gmail.com	123

@@ -1,5 +1,4 @@
 
-```markdown
 # 📚 Library Management System (LMS)
 
 ## 👥 Team Members

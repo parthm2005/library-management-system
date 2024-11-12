@@ -113,5 +113,3 @@ Contributions are welcome! To contribute:
 For any questions or feedback, feel free to open an issue or contact us!
 
 ---
-
-This README covers all essential details with emojis to make it more engaging and easy to navigate.

@@ -292,413 +292,447 @@ protected:
     vector<Book> borrowedBooks;
 
 public:
-    Student() {};
-    Student(string ID, string n, string e, string pass) : studentId(ID), name(n), email(e), password(pass) {}
-    Student get_student(const string &line)
-    {
-        istringstream iss(line);
-        string name, email, studentId, password;
+    Student();
+    Student(string ID, string n, string e, string pass);
+    Student get_student(const string &line);
+    string to_string() const;
+    string get_mem_books(string &line, string &p);
+    bool isStudentRegistered(string id);
+    bool isPasswordCorrect(string id, string pass);
+    bool isEmailRegistered(string email);
+    bool isBorrowed(string stu_id);
+    void returnAllBook(string id);
+    void displayBorrowedBooks(string stu_id);
+    friend ostream &operator<<(ostream &os, const Student &student);
+};
 
-        getline(iss, studentId, '\t');
-        getline(iss, name, '\t');
-        getline(iss, email, '\t');
-        getline(iss, password, '\t');
+Student::Student() {}
 
-        return Student(studentId, name, email, password);
-    }
-    string to_string() const{
-        return studentId + "\t" + name + "\t" + email + "\t" + password;
-    }
-    // void borrowBook(Book &book)
-    // {
-    // }
-    // void returnBook(Book &book)
-    // {
-    //     auto it = find(borrowedBooks.begin(), borrowedBooks.end(), book);
-    //     if (it != borrowedBooks.end())
-    //     {
-    //         book.returnBook();
-    //         borrowedBooks.erase(it);
-    //         cout << name << " returned ";
-    //         book.display();
-    //     }
-    //     else
-    //         cout << "This book was not borrowed by " << name << "." << endl;
-    // }
-    string get_mem_books(string &line, string &p)
+Student::Student(string ID, string n, string e, string pass) : studentId(ID), name(n), email(e), password(pass) {}
+
+Student Student::get_student(const string &line)
+{
+    istringstream iss(line);
+    string name, email, studentId, password;
+
+    getline(iss, studentId, '\t');
+    getline(iss, name, '\t');
+    getline(iss, email, '\t');
+    getline(iss, password, '\t');
+
+    return Student(studentId, name, email, password);
+}
+
+string Student::to_string() const
+{
+    return studentId + "\t" + name + "\t" + email + "\t" + password;
+}
+
+string Student::get_mem_books(string &line, string &p)
+{
+    istringstream iss(line);
+    string stu_id, book_id;
+    getline(iss, stu_id, '\t');
+    getline(iss, book_id, '\t');
+    p = stu_id;
+    return book_id;
+}
+
+bool Student::isStudentRegistered(string id)
+{
+    string line;
+    ifstream readf("students.txt");
+    if (readf.is_open())
     {
-        istringstream iss(line);
-        string stu_id, book_id;
-        getline(iss, stu_id, '\t');
-        getline(iss, book_id, '\t');
-        p = stu_id;
-        return book_id;
-    }
-    bool isStudentRegistered(string id){
         string line;
-        ifstream readf("students.txt");
-        if (readf.is_open())
+        while (getline(readf, line))
         {
-            string line;
-            while (getline(readf, line))
-            {   
-                Student s = get_student(line);
-                if (s.studentId == id)
-                {
-                    readf.close();
-                    return true;
-                }
+            Student s = get_student(line);
+            if (s.studentId == id)
+            {
+                readf.close();
+                return true;
             }
-            readf.close();
         }
-        else
-        {
-            cerr << "Unable to open the file students.txt" << endl;
-        }
+        readf.close();
+    }
+    else
+    {
+        cerr << "Unable to open the file students.txt" << endl;
+    }
     return false;
 }
-    bool isPasswordCorrect(string id, string pass){
-        ifstream readf("students.txt");
-        if (readf.is_open()){
-            string line;
-            while (getline(readf, line)){
-                Student s = get_student(line);
-                if (s.studentId == id && s.password == pass){
-                    readf.close();
-                    return true;
-                }
-            }
-            readf.close();
-            return false;
-        }
-        else{
-            cerr << "Unable to open the file students.txt" << endl;
-        }
-        return false;
-    }
-    bool isEmailRegistered(string email){
+
+bool Student::isPasswordCorrect(string id, string pass)
+{
+    ifstream readf("students.txt");
+    if (readf.is_open())
+    {
         string line;
-        ifstream readf("students.txt");
-        if (readf.is_open())
+        while (getline(readf, line))
         {
-            string line;
-            while (getline(readf, line))
-            {   
-                Student s = get_student(line);
-
-                if (s.email == email)
-                {
-                    readf.close();
-                    return true;
-                }
+            Student s = get_student(line);
+            if (s.studentId == id && s.password == pass)
+            {
+                readf.close();
+                return true;
             }
-            readf.close();
         }
-        else
-        {
-            cerr << "Unable to open the file students.txt" << endl;
-        }
+        readf.close();
         return false;
     }
-    bool isBorrowed(string stu_id)
+    else
     {
-        vector<string> list;
-        ifstream readf("bothids.txt");
-        bool chk=false;
-        if (readf.is_open())
-        {
+        cerr << "Unable to open the file students.txt" << endl;
+    }
+    return false;
+}
 
-            string line;
-            while (getline(readf, line))
-            {
-                string p = "";
-                string b = get_mem_books(line, p);
-                if (p == stu_id)
-                {
-                    list.push_back(b);
-                    chk=true;
-                    readf.close();
-                    return chk;
-                }
-            }
-            readf.close();
-        }
-        else
-        {
-            cout << "unable to open" << endl;
-        }
-        return chk;
-    }
-    void returnAllBook(string id){
-        vector<string> list;
-        ifstream readf("bothids.txt");
-        if (readf.is_open())
-        {
-            string line;
-            while (getline(readf, line))
-            {
-                string p = "";
-                string b = get_mem_books(line, p);
-                if (p == id)
-                {
-                    list.push_back(b);
-                }
-            }
-            readf.close();
-        }
-        else
-        {
-            cout << "unable to open" << endl;
-        }
-        for (auto it : list)
-        {
-            returnBook(it, id);
-        }
-    }
-    void displayBorrowedBooks(string stu_id)
+bool Student::isEmailRegistered(string email)
+{
+    string line;
+    ifstream readf("students.txt");
+    if (readf.is_open())
     {
-        vector<string> list;
-        ifstream readf("bothids.txt");
-        if (readf.is_open())
+        string line;
+        while (getline(readf, line))
         {
+            Student s = get_student(line);
 
-            string line;
-            while (getline(readf, line))
+            if (s.email == email)
             {
-                string p = "";
-                string b = get_mem_books(line, p);
-                if (p == stu_id)
-                {
-                    list.push_back(b);
-                }
+                readf.close();
+                return true;
             }
-            readf.close();
         }
-        else
-        {
-            cout << "unable to open" << endl;
-        }
-
-        for (auto it : list)
-        {
-            borrowed_books(it);
-        }
+        readf.close();
     }
-    
-    friend ostream &operator<<(ostream &os, const Student &student)
+    else
     {
-        if (student.studentId != "123")
-        {
-            os << left << setw(15) << student.studentId << setw(25) << student.name << setw(30) << student.email << endl;
-        }
-        return os;
+        cerr << "Unable to open the file students.txt" << endl;
     }
-};
+    return false;
+}
+
+bool Student::isBorrowed(string stu_id)
+{
+    vector<string> list;
+    ifstream readf("bothids.txt");
+    bool chk = false;
+    if (readf.is_open())
+    {
+        string line;
+        while (getline(readf, line))
+        {
+            string p = "";
+            string b = get_mem_books(line, p);
+            if (p == stu_id)
+            {
+                list.push_back(b);
+                chk = true;
+                readf.close();
+                return chk;
+            }
+        }
+        readf.close();
+    }
+    else
+    {
+        cout << "unable to open" << endl;
+    }
+    return chk;
+}
+
+void Student::returnAllBook(string id)
+{
+    vector<string> list;
+    ifstream readf("bothids.txt");
+    if (readf.is_open())
+    {
+        string line;
+        while (getline(readf, line))
+        {
+            string p = "";
+            string b = get_mem_books(line, p);
+            if (p == id)
+            {
+                list.push_back(b);
+            }
+        }
+        readf.close();
+    }
+    else
+    {
+        cout << "unable to open" << endl;
+    }
+    for (auto it : list)
+    {
+        returnBook(it, id);
+    }
+}
+
+void Student::displayBorrowedBooks(string stu_id)
+{
+    vector<string> list;
+    ifstream readf("bothids.txt");
+    if (readf.is_open())
+    {
+        string line;
+        while (getline(readf, line))
+        {
+            string p = "";
+            string b = get_mem_books(line, p);
+            if (p == stu_id)
+            {
+                list.push_back(b);
+            }
+        }
+        readf.close();
+    }
+    else
+    {
+        cout << "unable to open" << endl;
+    }
+
+    for (auto it : list)
+    {
+        borrowed_books(it);
+    }
+}
+
+ostream &operator<<(ostream &os, const Student &student)
+{
+    if (student.studentId != "123")
+    {
+        os << left << setw(15) << student.studentId << setw(25) << student.name << setw(30) << student.email << endl;
+    }
+    return os;
+}
+
 class Library : public Student
 {
 public:
-    Library() {};
-    void addbook(string tit, string auth, string publish, string id, bool isava)
-    {
-        // Book b1(tit,auth,publish,id,isava);
-        ofstream writef("books.txt", ios::app);
-        if (writef.is_open())
-        {
-            writef << id << "\t" << tit << "\t" << auth << "\t" << publish << "\t" << isava << "\n";
-            writef.close();
-        }
-        else
-        {
-            cerr << "Unable to open the file " << endl;
-        }
-    }
-    bool isChar(char c)
-    {
-        return ((c>='A' && c<='Z')||(c>='a'&&c<='z')||(c>='0'&&c<='9')||c=='@'||c=='.');
-    }
-    bool isEmailValid(string email)
-    {
-        if(email[0]=='@') return 0;
-        if(!isChar(email[0])) return 0;
-        int At=-1,Dot=-1;
-        for(int i=0;i<email.length();i++)
-        {
-            if(!isChar(email[i])) return 0;
-            if(email[i]=='@'&& At==-1) At=i;
-            else if(email[i]=='@' && At!=-1) return 0;
-            else if(email[i]=='.' && Dot!=i-1) Dot=i;
-            else if(email[i]=='.' && Dot==i-1) return 0;
-        }
-        if(At==-1 || Dot==-1) return 0;
-        if(At>Dot||At+1==Dot) return 0;
-        if(Dot>=email.length()-1) return 0;
-        return 1;
-    }
-    void addstudent(string studentId, string name, string email, string password)
-    {
-        ofstream writef("students.txt", ios::app);
-        if (writef.is_open())
-        {
-            writef << studentId << "\t"  << name << "\t" << email << "\t" << password << "\n";
-            writef.close();
-        }
-        else
-        {
-            cerr << "Unable to open the file " << endl;
-        }
-    }
-    void removebook(string id){
-        Book temp;
-        vector<Book> books;
-        if(temp.isBookThere(id)){
-            ifstream readf("books.txt");
-            if(!readf.is_open()){
-                cout<<"Unable to open book.txt!"<<endl;
-                return ;
-            }
-            else{
-                string line;
-                while(getline(readf,line)){
-                    Book b = get_details(line);
-                    istringstream iss(line);
-                    string isbn;
-                    getline(iss, isbn, '\t');
-                    if(isbn!=id){
-                        books.push_back(b);
-                    }
-                }
-                readf.close();
-            }
-            
-            ofstream writef("books.txt",ios::trunc);
-            if(!writef.is_open()){
-                cout<<"Unable to open books.txt for writing "<<endl;
-                return;
-            }
-            for(const auto &book:books){
-                writef<<book.to_string()<<endl;
-            }
-            writef.close();
-            cout<<"Book with "<<id<<" id removed successfully!"<<endl;
-        }
-        
-        else{
-            cout<<"Book with "<<id<<" id not found in the library."<<endl;
-        } 
-    }
+    Library();
+    void addbook(string tit, string auth, string publish, string id, bool isava);
+    bool isChar(char c);
+    bool isEmailValid(string email);
+    void addstudent(string studentId, string name, string email, string password);
+    void removebook(string id);
+    void removestudent(string id);
+    void searchbook(string id);
+    void dis_book();
+    void dis_student();
+};
 
-    void removestudent(string id){
-        vector<Student> students;
-        if(isStudentRegistered(id)){
-            ifstream readf("students.txt");
-            if(!readf.is_open()){
-                cout<<"Unable to open students.txt!"<<endl;
-                return ;
-            }
-            else{
-                if(id=="123"){
-                    cout<<"You can not remove admin!"<<endl;
-                    return;
+Library::Library() {}
+
+void Library::addbook(string tit, string auth, string publish, string id, bool isava)
+{
+    ofstream writef("books.txt", ios::app);
+    if (writef.is_open())
+    {
+        writef << id << "\t" << tit << "\t" << auth << "\t" << publish << "\t" << isava << "\n";
+        writef.close();
+    }
+    else
+    {
+        cerr << "Unable to open the file " << endl;
+    }
+}
+
+bool Library::isChar(char c)
+{
+    return ((c>='A' && c<='Z')||(c>='a'&&c<='z')||(c>='0'&&c<='9')||c=='@'||c=='.');
+}
+
+bool Library::isEmailValid(string email)
+{
+    if(email[0]=='@') return 0;
+    if(!isChar(email[0])) return 0;
+    int At=-1,Dot=-1;
+    for(int i=0;i<email.length();i++)
+    {
+        if(!isChar(email[i])) return 0;
+        if(email[i]=='@'&& At==-1) At=i;
+        else if(email[i]=='@' && At!=-1) return 0;
+        else if(email[i]=='.' && Dot!=i-1) Dot=i;
+        else if(email[i]=='.' && Dot==i-1) return 0;
+    }
+    if(At==-1 || Dot==-1) return 0;
+    if(At>Dot||At+1==Dot) return 0;
+    if(Dot>=email.length()-1) return 0;
+    return 1;
+}
+
+void Library::addstudent(string studentId, string name, string email, string password)
+{
+    ofstream writef("students.txt", ios::app);
+    if (writef.is_open())
+    {
+        writef << studentId << "\t"  << name << "\t" << email << "\t" << password << "\n";
+        writef.close();
+    }
+    else
+    {
+        cerr << "Unable to open the file " << endl;
+    }
+}
+
+void Library::removebook(string id)
+{
+    Book temp;
+    vector<Book> books;
+    if(temp.isBookThere(id)){
+        ifstream readf("books.txt");
+        if(!readf.is_open()){
+            cout<<"Unable to open book.txt!"<<endl;
+            return ;
+        }
+        else{
+            string line;
+            while(getline(readf,line)){
+                Book b = get_details(line);
+                istringstream iss(line);
+                string isbn;
+                getline(iss, isbn, '\t');
+                if(isbn!=id){
+                    books.push_back(b);
                 }
-                if(isBorrowed(id)){
-                    cout<<"You can only remove student after returning all borrowed books!"<<endl;
-                    cout<<"borrowed books are:"<<endl;
-                    displayBorrowedBooks(id);
-                }
-                while(1){
-                    if(isBorrowed(id)){
-                        cout<<"Do you want to return all borrowed books? (y/n): ";
-                        string response;
-                        cin>>response;
-                        if(response == "y" || response == "Y" || response == "yes" || response == "Yes" || response == "YES"){
-                            returnAllBook(id);
-                            break;
-                        }
-                        else if(response == "n" || response == "N" || response == "no" || response == "No" || response == "No"){
-                            cout<<"You can not remove student without returning all borrowed books!"<<endl;
-                            return;
-                        }
-                        else{
-                            cout<<"Please enter valid input!"<<endl;
-                        }
-                    }
-                    else{
-                        break;
-                    }
-                }
-                string line;
-                while(getline(readf,line)){
-                    Student s = get_student(line);
-                    istringstream iss(line);
-                    string sid;
-                    getline(iss, sid, '\t');
-                    if(sid!=id){
-                        students.push_back(s);
-                    }
-                }
-                readf.close();
             }
-            
-            ofstream writef("students.txt",ios::trunc);
-            if(!writef.is_open()){
-                cout<<"Unable to open students.txt for writting "<<endl;
-                return;
-            }
-            for(const auto &student:students){
-                writef<<student.to_string()<<endl;
-            }
-            writef.close();
-            cout<<"Student with "<<id<<" id removed successfully!"<<endl;
+            readf.close();
         }
         
-        else{
-            cout<<"Student not found."<<endl;
-        } 
+        ofstream writef("books.txt",ios::trunc);
+        if(!writef.is_open()){
+            cout<<"Unable to open books.txt for writing "<<endl;
+            return;
+        }
+        for(const auto &book:books){
+            writef<<book.to_string()<<endl;
+        }
+        writef.close();
+        cout<<"Book with "<<id<<" id removed successfully!"<<endl;
     }
     
-    void searchbook(string id)
-    {
-        Available(id);
-    }
-    void dis_book()
-    {
-        ifstream readf("books.txt");
-        if (readf.is_open())
-        {
+    else{
+        cout<<"Book with "<<id<<" id not found in the library."<<endl;
+    } 
+}
 
-            string line;
-            while (getline(readf, line))
-            {
-                Book book = get_details(line);
-                cout << book;
-            }
-            readf.close();
-        }
-        else
-        {
-            cout << "unable to open" << endl;
-        }
-    }
-    void dis_student()
-    {
+void Library::removestudent(string id)
+{
+    vector<Student> students;
+    if(isStudentRegistered(id)){
         ifstream readf("students.txt");
-        if (readf.is_open())
-        {
-
+        if(!readf.is_open()){
+            cout<<"Unable to open students.txt!"<<endl;
+            return ;
+        }
+        else{
+            if(id=="123"){
+                cout<<"You can not remove admin!"<<endl;
+                return;
+            }
+            if(isBorrowed(id)){
+                cout<<"You can only remove student after returning all borrowed books!"<<endl;
+                cout<<"borrowed books are:"<<endl;
+                displayBorrowedBooks(id);
+            }
+            while(1){
+                if(isBorrowed(id)){
+                    cout<<"Do you want to return all borrowed books? (y/n): ";
+                    string response;
+                    cin>>response;
+                    if(response == "y" || response == "Y" || response == "yes" || response == "Yes" || response == "YES"){
+                        returnAllBook(id);
+                        break;
+                    }
+                    else if(response == "n" || response == "N" || response == "no" || response == "No" || response == "No"){
+                        cout<<"You can not remove student without returning all borrowed books!"<<endl;
+                        return;
+                    }
+                    else{
+                        cout<<"Please enter valid input!"<<endl;
+                    }
+                }
+                else{
+                    break;
+                }
+            }
             string line;
-            while (getline(readf, line))
-            {
-                Student student = get_student(line);
-                cout << student;
+            while(getline(readf,line)){
+                Student s = get_student(line);
+                istringstream iss(line);
+                string sid;
+                getline(iss, sid, '\t');
+                if(sid!=id){
+                    students.push_back(s);
+                }
             }
             readf.close();
         }
-        else
-        {
-            cout << "unable to open" << endl;
+        
+        ofstream writef("students.txt",ios::trunc);
+        if(!writef.is_open()){
+            cout<<"Unable to open students.txt for writting "<<endl;
+            return;
         }
+        for(const auto &student:students){
+            writef<<student.to_string()<<endl;
+        }
+        writef.close();
+        cout<<"Student with "<<id<<" id removed successfully!"<<endl;
     }
-};
+    
+    else{
+        cout<<"Student not found."<<endl;
+    } 
+}
+
+void Library::searchbook(string id)
+{
+    Available(id);
+}
+
+void Library::dis_book()
+{
+    ifstream readf("books.txt");
+    if (readf.is_open())
+    {
+
+        string line;
+        while (getline(readf, line))
+        {
+            Book book = get_details(line);
+            cout << book;
+        }
+        readf.close();
+    }
+    else
+    {
+        cout << "unable to open" << endl;
+    }
+}
+
+void Library::dis_student()
+{
+    ifstream readf("students.txt");
+    if (readf.is_open())
+    {
+
+        string line;
+        while (getline(readf, line))
+        {
+            Student student = get_student(line);
+            cout << student;
+        }
+        readf.close();
+    }
+    else
+    {
+        cout << "unable to open" << endl;
+    }
+}
 
 
 void menu(){

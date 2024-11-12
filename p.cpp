@@ -280,7 +280,7 @@ bool Book::isBookThere(string id)
     }
     else
     {
-        cerr << "Unable to open the file students.txt" << endl;
+        cerr << "Unable to open the file books.txt" << endl;
     }
     return false;
 }

@@ -71,7 +71,7 @@ void Book::borrow(string sid, string bid)
                 }
                 else
                 {
-                    cout << "Book is not availabale to borrow." << endl;
+                    cout << "Book is not available to borrow." << endl;
                 }
                 flag = true;
             }
@@ -131,7 +131,7 @@ void Book::returnBook(string bid, string sid)
                 }
                 else
                 {
-                    cout << "You can't return book which you have not! Book is already available in the library" << endl;
+                    cout << "You can't return book which you have not borrowed! Book is already available in the library" << endl;
                 }
             }
             books.push_back(b);
@@ -572,7 +572,7 @@ public:
             
             ofstream writef("books.txt",ios::trunc);
             if(!writef.is_open()){
-                cout<<"Unable to open books.txt for writting "<<endl;
+                cout<<"Unable to open books.txt for writing "<<endl;
                 return;
             }
             for(const auto &book:books){
@@ -711,15 +711,15 @@ void menu(){
 
         while(flag){
             cout<<"What do you want?\n";
-            cout<<"For add book, enter a \n";    
-            cout<<"For add student, enter b \n";    
-            cout<<"For remove book, enter c \n";    
-            cout<<"For remove student, enter d \n";    
-            cout<<"For search the book by id, enter e \n";    
-            cout<<"For display all books, enter f \n";
-            cout<<"For display all students, enter g \n";
+            cout<<"To add book, enter a \n";    
+            cout<<"To add student, enter b \n";    
+            cout<<"To remove book, enter c \n";    
+            cout<<"To remove student, enter d \n";    
+            cout<<"To search the book by id, enter e \n";    
+            cout<<"To display all books, enter f \n";
+            cout<<"To display all students, enter g \n";
             // cout<<"For doing student things, enter S\n";
-            cout<<"For close the menu, enter z\n";
+            cout<<"To close the menu, enter z\n";
             cin>>chr;
             if(chr=='z'){
                 break;
@@ -735,10 +735,10 @@ void menu(){
                 while(1){
 
 
-                    cout<<"For continue with add book enter 1, for go to previouse menu enter 2: ";
+                    cout<<"For continue with adding book enter 1, for go to previous menu enter 2: ";
                     cin>>check;
                     while((check!="1")&&(check!="2")){
-                        cout<<"Please enter 1 or 2 only for add book or go to previouse menu respectively: ";
+                        cout<<"Please enter 1 or 2 only for add book or go to previous menu respectively: ";
                         cin>>check;
                     }
                     if(check=="2"){
@@ -792,10 +792,10 @@ void menu(){
                 while(1){
 
 
-                    cout<<"For continue with add student enter 1, for go to previouse menu enter 2: ";
+                    cout<<"For continue with add student enter 1, for go to previous menu enter 2: ";
                     cin>>check;
                     while((check!="1")&&(check!="2")){
-                        cout<<"Please enter 1 or 2 only for add student or go to previouse menu respectively: ";
+                        cout<<"Please enter 1 or 2 only for add student or go to previous menu respectively: ";
                         cin>>check;
                     }
                     if(check=="2"){
@@ -807,7 +807,7 @@ void menu(){
                         cout<<"Enter student Id: ";
                         cin>>studentId;
                         if(admin.isStudentRegistered(studentId)){
-                            cout<<"This student id is registered for another student, please enter other student id!"<<endl;
+                            cout<<"This student id is registered with another student, please enter other student id!"<<endl;
                         }
                         else{
                             break;
@@ -827,7 +827,7 @@ void menu(){
                         cout<<"Enter email of the student: ";
                         cin>>email;
                         if(admin.isEmailRegistered(email)){
-                            cout<<"This Email is already registed with different student, Kindly register with different email!"<<endl;
+                            cout<<"This Email is already registered with different student, Kindly register with different email!"<<endl;
                         }
                         else if(!admin.isEmailValid(email)){
                             cout<<"Please enter valid email address!"<<endl;
@@ -854,10 +854,10 @@ void menu(){
                 while(1){
 
 
-                    cout<<"For continue with remove book enter 1, for go to previouse menu enter 2: ";
+                    cout<<"For continue with remove book enter 1, for go to previous menu enter 2: ";
                     cin>>check;
                     while((check!="1")&&(check!="2")){
-                        cout<<"Please enter 1 or 2 only for remove book or go to previouse menu respectively: ";
+                        cout<<"Please enter 1 or 2 only for remove book or go to previous menu respectively: ";
                         cin>>check;
                     }
                     if(check=="2"){
@@ -885,10 +885,10 @@ void menu(){
                 while(1){
 
 
-                    cout<<"For continue with remove student enter 1, for go to previouse menu enter 2: ";
+                    cout<<"For continue with remove student enter 1, for go to previous menu enter 2: ";
                     cin>>check;
                     while((check!="1")&&(check!="2")){
-                        cout<<"Please enter 1 or 2 only for remove student or go to previouse menu respectively: ";
+                        cout<<"Please enter 1 or 2 only for remove student or go to previous menu respectively: ";
                         cin>>check;
                     }
                     if(check=="2"){
@@ -920,10 +920,10 @@ void menu(){
                 while(1){
 
 
-                    cout<<"For continue with search the book, enter 1, for go to previouse menu enter 2: ";
+                    cout<<"For continue with searching the book, enter 1, for go to previous menu enter 2: ";
                     cin>>check;
                     while((check!="1")&&(check!="2")){
-                        cout<<"Please enter 1 or 2 only for search the book or go to previouse menu respectively: ";
+                        cout<<"Please enter 1 or 2 only for search the book or go to previous menu respectively: ";
                         cin>>check;
                     }
                     if(check=="2"){
@@ -938,10 +938,10 @@ void menu(){
             
             case 'f':
 
-                cout<<"For continue with display all books, enter 1; for go to previouse menu enter 2: ";
+                cout<<"For continue with displaying all books, enter 1; for go to previous menu enter 2: ";
                 cin>>check;
                 while((check!="1")&&(check!="2")){
-                    cout<<"Please enter 1 or 2 only for display all books or go to previouse menu respectively: ";
+                    cout<<"Please enter 1 or 2 only for display all books or go to previous menu respectively: ";
                     cin>>check;
                 }
 
@@ -956,10 +956,10 @@ void menu(){
             
             case 'g':
 
-                cout<<"For continue with display all students, enter 1; for go to previouse menu enter 2: ";
+                cout<<"For continue with displaying all students, enter 1; for go to previous menu enter 2: ";
                 cin>>check;
                 while((check!="1")&&(check!="2")){
-                    cout<<"Please enter 1 or 2 only for display all students or go to previouse menu respectively: ";
+                    cout<<"Please enter 1 or 2 only for display all students or go to previous menu respectively: ";
                     cin>>check;
                 }
                 if(check=="2"){
@@ -991,10 +991,10 @@ void menu(string id, string password){
 
         while(flag){
             cout<<"What do you want?\n";
-            cout<<"For borrow the book, enter a \n";    
-            cout<<"For return the book, enter b \n";
-            cout<<"For display borrowed book, enter c \n";
-            cout<<"For close the menu, enter z\n";
+            cout<<"To borrow the book, enter a \n";    
+            cout<<"To return the book, enter b \n";
+            cout<<"To display borrowed book, enter c \n";
+            cout<<"To close the menu, enter z\n";
             cin>>chr;
             if(chr=='z'){
                 break;
@@ -1007,10 +1007,10 @@ void menu(string id, string password){
             case 'a':
                 while(1){
 
-                    cout<<"For continue with borrow the book enter 1, for go to previouse menu enter 2: ";
+                    cout<<"For continue with borrowing the book enter 1, for go to previous menu enter 2: ";
                     cin>>check;
                     while((check!="1")&&(check!="2")){
-                        cout<<"Please enter 1 or 2 only for borrow the book or go to previouse menu respectively: ";
+                        cout<<"Please enter 1 or 2 only for borrow the book or go to previous menu respectively: ";
                         cin>>check;
                     }
                     if(check=="2"){
@@ -1036,10 +1036,10 @@ void menu(string id, string password){
             case 'b':
                 while(1){
 
-                    cout<<"For continue with return the book enter 1, for go to previouse menu enter 2: ";
+                    cout<<"For continue with return the book enter 1, for go to previous menu enter 2: ";
                     cin>>check;
                     while((check!="1")&&(check!="2")){
-                        cout<<"Please enter 1 or 2 only for return the book or go to previouse menu respectively: ";
+                        cout<<"Please enter 1 or 2 only for return the book or go to previous menu respectively: ";
                         cin>>check;
                     }
                     if(check=="2"){
@@ -1071,10 +1071,10 @@ void menu(string id, string password){
 
             case 'c':
 
-                cout<<"For continue with display borrowed books enter 1, for go to previouse menu enter 2: ";
+                cout<<"For continue with display borrowed books enter 1, for go to previous menu enter 2: ";
                 cin>>check;
                 while((check!="1")&&(check!="2")){
-                    cout<<"Please enter 1 or 2 only for display borrowed books or go to previouse menu respectively: ";
+                    cout<<"Please enter 1 or 2 only for display borrowed books or go to previous menu respectively: ";
                     cin>>check;
                 }
                 if(check=="2"){

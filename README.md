@@ -53,8 +53,8 @@ To run the Library Management System locally, follow these steps:
 
 1. **📥 Clone the Repository**:
    ```bash
-   git clone https://github.com/parthm2005/librrrrrrrrrrrrary.git
-   cd librrrrrrrrrrrrary
+   git clone https://github.com/parthm2005/library.git
+   cd library
    ```
 
 2. **⚙️ Compile the Code**:
